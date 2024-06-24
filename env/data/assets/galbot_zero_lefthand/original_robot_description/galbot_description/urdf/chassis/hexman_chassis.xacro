@@ -1,0 +1,468 @@
+<?xml version="1.0"?>
+<!-- #####################################################################################
+#
+# Copyleft (c) 2023 Galbot, Inc. All lefts Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Xacro file for hexman chassis.
+# Version: 1.6
+# Date: 2023-12-23
+# Author: Herman Ye@Galbot
+#
+#####################################################################################
+# Revision History:
+#
+# Date       Version  Author       Description
+# 2023-10-12 1.0      Herman Ye    Created.
+# 2023-10-19 1.1      Herman Ye    Add pybullet support.
+# 2023-10-20 1.2      Herman Ye    Fix caster wheels collision bug.
+# 2023-11-30 1.3      Herman Ye    Update base for new hardware version.
+# 2023-12-22 1.4      Herman Ye    Add lidar and caster swivel wheels.
+# 2023-12-23 1.5      Herman Ye    Adjust dynamic parameters.
+# 2023-12-23 1.6      Herman Ye    Add cylinder for caster wheels and main wheels.
+#####################################################################################-->
+
+
+<robot name="hexman_chassis" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="hexman_chassis" params="parent *origin  name:=hexman_chassis">
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
+    <joint name="${name}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}" />
+      <child link="${name}_base_link" />
+    </joint>
+
+
+    <link name="${name}_base_link">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0.0019437 -2.5309E-05 0.094764" />
+        <mass value="20.4113" />
+        <!-- <mass value="7.4113" /> -->
+        <inertia ixx="0.075816" ixy="9.0316E-09" ixz="1.816E-05" iyy="0.083303" iyz="9.8923E-09"
+          izz="0.15228" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://galbot_description/meshes/chassis/hexman_chassis_base_link.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0  0 0" xyz="0 0 0.089" />
+        <geometry>
+          <box size="0.443 0.2 0.089" />
+          <!-- <mesh filename="package://galbot_description/meshes/chassis/hexman_chassis_base_link.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+
+
+    <link name="${name}_right_wheel_link">
+      <inertial>
+        <origin rpy="0 0 0" xyz="-2.5255E-19 0 -0.0004362" />
+        <mass value="0.5968" />
+        <inertia ixx="0.00067338" ixy="1.2511E-08" ixz="-2.7671E-20" iyy="0.00067336"
+          iyz="1.2923E-18"
+          izz="0.0010757" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_right_wheel_link.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <cylinder radius="0.0650" length="0.0386" />
+          <!-- <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_right_wheel_link.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_right_wheel_joint" type="continuous">
+      <origin rpy="-1.5708 0 3.1416" xyz="0 -0.1341 0.067" />
+      <parent link="${name}_base_link" />
+      <child link="${name}_right_wheel_link" />
+      <axis xyz="0 0 -1" />
+      <dynamics damping="100.0" friction="0.0" />
+      <transmission name="${name}_right_wheel_joint_trans">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="${name}_right_wheel_joint">
+          <hardwareInterface>VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="${name}_right_wheel_joint_motor">
+          <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+      </transmission>
+    </joint>
+    <link name="${name}_left_wheel_link">
+      <inertial>
+        <origin rpy="0 0 0" xyz="-7.3416E-19 0 0.0004362" />
+        <mass value="0.5968" />
+        <inertia ixx="0.00067338" ixy="-1.2742E-08" ixz="-3.5321E-20" iyy="0.00067336"
+          iyz="-3.1288E-18" izz="0.0010757" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_left_wheel_link.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <cylinder radius="0.0650" length="0.0386" />
+          <!-- <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_left_wheel_link.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_left_wheel_joint" type="continuous">
+      <origin rpy="-1.5708 0 3.1416" xyz="0 0.1341 0.067" />
+      <parent link="${name}_base_link" />
+      <child link="${name}_left_wheel_link" />
+      <axis xyz="0 0 1" />
+      <dynamics damping="100.0" friction="0.0" />
+      <transmission name="${name}_left_wheel_joint_trans">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="${name}_left_wheel_joint">
+          <hardwareInterface>VelocityJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="${name}_left_wheel_joint_motor">
+          <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+      </transmission>
+
+    </joint>
+    <link name="${name}_caster_swivel_link1">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0.014272 7.0133E-05 -0.0064185" />
+        <mass value="0.0058282" />
+        <inertia ixx="1.0504E-06" ixy="-9.9424E-10" ixz="4.8427E-08" iyy="1.2527E-06"
+          iyz="2.3797E-10"
+          izz="1.3349E-06" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_swivel_link1.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_swivel_link1.stl" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_caster_swivel_joint1" type="continuous">
+      <origin rpy="0 0 3.1416" xyz="0.21 0.29 0.037" />
+      <parent link="${name}_base_link" />
+      <child link="${name}_caster_swivel_link1" />
+      <axis xyz="0 0 -1" />
+      <dynamics damping="0.1" friction="0.0" />
+    </joint>
+    <link name="${name}_caster_wheel_link1">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <mass value="0.0083449" />
+        <inertia ixx="5.2694E-07" ixy="1.2465E-25" ixz="-1.7105E-23" iyy="5.2694E-07"
+          iyz="7.4033E-23"
+          izz="6.5194E-07" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_wheel_link1.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <cylinder radius="0.0125" length="0.017" />
+          <!-- <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_wheel_link1.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_caster_wheel_joint1" type="continuous">
+      <origin rpy="-1.5757 1.5708 3.1416" xyz="0.015 7.3709E-05 -0.0245" />
+      <parent link="${name}_caster_swivel_link1" />
+      <child link="${name}_caster_wheel_link1" />
+      <axis xyz="0 0 -1" />
+      <dynamics damping="0.1" friction="0.0" />
+    </joint>
+    <link name="${name}_caster_swivel_link2">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0.014272 0 -0.0064185" />
+        <mass value="0.0058282" />
+        <inertia ixx="1.0504E-06" ixy="6.2844E-22" ixz="4.8428E-08" iyy="1.2527E-06"
+          iyz="-1.4139E-22"
+          izz="1.3349E-06" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_swivel_link2.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_swivel_link2.stl" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_caster_swivel_joint2" type="continuous">
+      <origin rpy="0 0 3.1416" xyz="0.21 -0.29 0.037" />
+      <parent link="${name}_base_link" />
+      <child link="${name}_caster_swivel_link2" />
+      <axis xyz="0 0 -1" />
+      <dynamics damping="0.1" friction="0.0" />
+    </joint>
+    <link name="${name}_caster_wheel_link2">
+      <inertial>
+        <origin rpy="0 0 0" xyz="-2.7756E-17 0 0" />
+        <mass value="0.0083449" />
+        <inertia ixx="5.2694E-07" ixy="-1.3642E-37" ixz="4.5487E-23" iyy="5.2694E-07"
+          iyz="3.966E-25"
+          izz="6.5194E-07" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_wheel_link2.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <cylinder radius="0.0125" length="0.017" />
+          <!-- <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_wheel_link2.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_caster_wheel_joint2" type="continuous">
+      <origin rpy="-1.5708 0 3.1416" xyz="0.015 0 -0.0245" />
+      <parent link="${name}_caster_swivel_link2" />
+      <child link="${name}_caster_wheel_link2" />
+      <axis xyz="0 0 -1" />
+      <dynamics damping="0.1" friction="0.0" />
+    </joint>
+    <link name="${name}_caster_swivel_link3">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0.014272 0 -0.0064185" />
+        <mass value="0.0058282" />
+        <inertia ixx="1.0504E-06" ixy="1.9371E-22" ixz="4.8428E-08" iyy="1.2527E-06"
+          iyz="5.7206E-24"
+          izz="1.3349E-06" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_swivel_link3.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_swivel_link3.stl" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_caster_swivel_joint3" type="continuous">
+      <origin rpy="0 0 3.1416" xyz="-0.21 -0.29 0.037" />
+      <parent link="${name}_base_link" />
+      <child link="${name}_caster_swivel_link3" />
+      <axis xyz="0 0 -1" />
+      <dynamics damping="0.1" friction="0.0" />
+    </joint>
+    <link name="${name}_caster_wheel_link3">
+      <inertial>
+        <origin rpy="0 0 0" xyz="-2.7756E-17 -1.7347E-18 0" />
+        <mass value="0.0083449" />
+        <inertia ixx="5.2695E-07" ixy="9.843E-26" ixz="6.1423E-10" iyy="5.2694E-07" iyz="3.3473E-23"
+          izz="6.5194E-07" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_wheel_link3.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <cylinder radius="0.0125" length="0.017" />
+          <!-- <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_wheel_link3.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_caster_wheel_joint3" type="continuous">
+      <origin rpy="-1.5708 0 3.1416" xyz="0.015 -7.3709E-05 -0.0245" />
+      <parent link="${name}_caster_swivel_link3" />
+      <child link="${name}_caster_wheel_link3" />
+      <axis xyz="0.0049139 0 0.99999" />
+      <dynamics damping="0.1" friction="0.0" />
+    </joint>
+    <link name="${name}_caster_swivel_link4">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0.014272 7.0133E-05 -0.0064185" />
+        <mass value="0.0058282" />
+        <inertia ixx="1.0504E-06" ixy="-9.9424E-10" ixz="4.8427E-08" iyy="1.2527E-06"
+          iyz="2.3797E-10"
+          izz="1.3349E-06" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_swivel_link4.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_swivel_link4.stl" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_caster_swivel_joint4" type="continuous">
+      <origin rpy="0 0 3.1416" xyz="-0.21 0.29 0.037" />
+      <parent link="${name}_base_link" />
+      <child link="${name}_caster_swivel_link4" />
+      <axis xyz="0 0 -1" />
+      <dynamics damping="0.1" friction="0.0" />
+    </joint>
+    <link name="${name}_caster_wheel_link4">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 2.7756E-17 -5.5511E-17" />
+        <mass value="0.0083449" />
+        <inertia ixx="5.2694E-07" ixy="1.2465E-25" ixz="-1.7105E-23" iyy="5.2694E-07"
+          iyz="7.4033E-23"
+          izz="6.5194E-07" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_wheel_link4.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <cylinder radius="0.0125" length="0.017" />
+          <!-- <mesh
+            filename="package://galbot_description/meshes/chassis/hexman_chassis_caster_wheel_link4.stl" /> -->
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_caster_wheel_joint4" type="continuous">
+      <origin rpy="-1.5757 1.5708 3.1416" xyz="0.015 7.3709E-05 -0.0245" />
+      <parent link="${name}_caster_swivel_link4" />
+      <child link="${name}_caster_wheel_link4" />
+      <axis xyz="0 0 -1" />
+      <dynamics damping="0.1" friction="0.0" />
+    </joint>
+    <link name="${name}_lidar_link">
+      <inertial>
+        <origin rpy="0 0 0" xyz="-0.0039812 -3.8899E-05 -0.014046" />
+        <mass value="0.061645" />
+        <inertia ixx="3.7195E-05" ixy="2.5674E-09" ixz="-1.0731E-07" iyy="3.3749E-05"
+          iyz="1.8972E-08"
+          izz="5.2832E-05" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://galbot_description/meshes/chassis/hexman_chassis_lidar_link.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://galbot_description/meshes/chassis/hexman_chassis_lidar_link.stl" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_lidar_joint" type="fixed">
+      <origin rpy="0 0 3.1416" xyz="0.15 0 0.2005" />
+      <parent link="${name}_base_link" />
+      <child link="${name}_lidar_link" />
+      <axis xyz="0 0 0" />
+    </joint>
+
+    <link name="${name}_lift_fix_point_link"></link>
+
+    <joint name="${name}_lift_fix_point_joint" type="fixed">
+      <origin rpy="0 0 0" xyz="-0.1045 0 0.1504" />
+      <parent link="${name}_base_link" />
+      <child link="${name}_lift_fix_point_link" />
+      <axis xyz="0 0 0" />
+    </joint>
+  </xacro:macro>
+</robot>

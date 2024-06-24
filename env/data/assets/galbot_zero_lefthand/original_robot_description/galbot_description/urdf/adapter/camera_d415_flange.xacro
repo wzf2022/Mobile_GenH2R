@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!-- #####################################################################################
+#
+# Copyright (c) 2023 Galbot, Inc. All Rights Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Xacro file for gripper inspire flange
+# Version: 1.0
+# Date: 2023-09-27
+# Author: Herman Ye@Galbot
+#
+##################################################################################### -->
+
+<robot name="camera_d415_flange" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:macro name="camera_d415_flange"
+        params="parent *origin  name:=camera_d415_flange">
+        <xacro:property name="M_PI" value="3.1415926535897931" />
+
+        <joint name="${name}_joint" type="fixed">
+            <xacro:insert_block name="origin" />
+            <parent link="${parent}" />
+            <child link="${name}_link" />
+        </joint>
+
+        <link name="${name}_link">
+                <inertial>
+                  <origin rpy="0 0 0" xyz="0.0592822351376299 -0.00148955992172333 -1.22797983111768E-18"/>
+                  <mass value="0.0176545384826988"/>
+                  <inertia ixx="7.7882126527069E-06" ixy="9.59349299176604E-09" ixz="6.26265028189193E-22" iyy="2.12052757044674E-05" iyz="1.57916543683687E-22" izz="1.34435410109635E-05"/>
+                </inertial>
+                <visual>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <geometry>
+                    <mesh filename="package://galbot_description/meshes/adapter/camera_d415_flange.stl"/>
+                  </geometry>
+                  <material name="">
+                    <color rgba="0.898039215686275 0.917647058823529 0.929411764705882 1"/>
+                  </material>
+                </visual>
+                <collision>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <geometry>
+                    <mesh filename="package://galbot_description/meshes/adapter/camera_d415_flange.stl"/>
+                  </geometry>
+                </collision>
+              </link>
+
+    </xacro:macro>
+</robot>

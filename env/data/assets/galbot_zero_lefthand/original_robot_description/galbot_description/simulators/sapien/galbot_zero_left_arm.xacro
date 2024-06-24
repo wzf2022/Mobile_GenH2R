@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!-- #####################################################################################
+#
+# Copyright (c) 2023 Galbot, Inc. All Rights Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Xacro file for Galbot Zero left arm, specified in the sapien
+# Version: 1.2
+# Date: 2023-10-23
+# Author: Herman Ye@Galbot
+# Warning: Do not use this file if you are not using Sapien.
+#
+##################################################################################### -->
+
+<robot name="galbot_zero" xmlns:xacro="http://ros.org/wiki/xacro">
+    <!-- Include-->
+    <xacro:include filename="$(find galbot_description)/urdf/adapter/arm_end_effector_flange.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/adapter/gripper_inspire_flange.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/gripper/gripper_inspire.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/adapter/camera_d415_flange.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/camera/camera_d415.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/body/torsor.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/adapter/arm_base_flange.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/arm/realman_rm65.xacro" />
+    <xacro:include filename='$(find galbot_description)/urdf/base/hexman_base.xacro' />
+    <!-- Properties -->
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
+    <!-- Links and joints -->
+    <!-- Base Link -->
+    <link name="base_link" />
+
+
+    <!-- Body Torsor -->
+    <xacro:torsor parent="base_link" name="body_torsor">
+        <origin xyz="0 0 0" rpy="-${M_PI/2} 0 0" />
+    </xacro:torsor>
+
+    <!-- Left Arm Base Flange -->
+    <xacro:arm_base_flange parent="body_torsor_link" name="left_arm_base_flange">
+        <origin
+            xyz="0 -0.25 0.05"
+            rpy="${M_PI/2} 0 -${M_PI}" />
+    </xacro:arm_base_flange>
+
+    <!-- Left Arm -->
+    <xacro:realman_rm65 parent="left_arm_base_flange_link" name="left_arm">
+        <origin xyz="0.0 0.0 0.0" rpy="-${M_PI/2} -${M_PI/2} 0" />
+    </xacro:realman_rm65>
+    <!-- Left Arm End Effector Flange -->
+    <xacro:arm_end_effector_flange parent="left_arm_link6" name="left_arm_end_effector_flange">
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+    </xacro:arm_end_effector_flange>
+
+    <!-- Left Arm Camera Flange -->
+    <xacro:camera_d415_flange parent="left_arm_end_effector_flange_link"
+        name="left_arm_camera_d415_flange">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:camera_d415_flange>
+    <!-- Left Arm Camera -->
+    <xacro:arg name="use_nominal_extrinsics" default="false" />
+    <xacro:arg name="add_plug" default="true" />
+    <xacro:arg name="use_mesh" default="true" />
+    <xacro:camera_d415 parent="left_arm_end_effector_flange_link"
+        name="left_arm_camera"
+        use_nominal_extrinsics="$(arg use_nominal_extrinsics)"
+        add_plug="$(arg add_plug)" use_mesh="$(arg use_mesh)">
+        <origin rpy="-${M_PI/2} 0 ${M_PI/2}" xyz="-0.0935 0.01 0" />
+    </xacro:camera_d415>
+
+    <!-- Gripper Inspire Flange-->
+    <xacro:gripper_inspire_flange parent="left_arm_end_effector_flange_link">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:gripper_inspire_flange>
+    <!-- Gripper Inspire-->
+    <xacro:gripper_inspire parent="gripper_inspire_flange_link">
+        <!-- <origin xyz="0 0.012 0" rpy="${M_PI/6} 0 ${M_PI/2}" /> -->
+        <origin xyz="0 0.012 0" rpy="${-M_PI/2} ${-M_PI/2} 0" />
+    </xacro:gripper_inspire>
+
+
+
+</robot>

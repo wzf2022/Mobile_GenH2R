@@ -1,0 +1,930 @@
+<?xml version="1.0" ?>
+<robot name="mano">
+  <link name="link0">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <link name="link1">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint1" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link0"/>
+    <child link="link1"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1000" upper="1000"/>
+  </joint>
+  <link name="link2">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint2" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link1"/>
+    <child link="link2"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1000" upper="1000"/>
+  </joint>
+  <link name="link3">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint3" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link2"/>
+    <child link="link3"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1000" upper="1000"/>
+  </joint>
+  <link name="link4">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint4" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link3"/>
+    <child link="link4"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="1" upper="-1"/>
+  </joint>
+  <link name="link5">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint5" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link4"/>
+    <child link="link5"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="1" upper="-1"/>
+  </joint>
+  <link name="link6">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint6" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link5"/>
+    <child link="link6"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="1" upper="-1"/>
+  </joint>
+  <link name="link7">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.2000000000000000111022302462515654042363166809082031250000000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh1.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh1.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint7" type="fixed">
+    <origin xyz="-0.0925819527570164030327859450153482612222433090209960937500000000 0.0067236533235607714997783546095888596028089523315429687500000000 0.0064649745723885628304050676717906753765419125556945800781250000" rpy="0 0 0"/>
+    <parent link="link6"/>
+    <child link="link7"/>
+    <axis xyz="0 0 0"/>
+    <limit lower="1" upper="-1"/>
+  </joint>
+  <link name="link8">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint8" type="revolute">
+    <origin xyz="0.0856721999607050199720958971738582476973533630371093750000000000 -0.0050723167296994539632315479593671625480055809020996093750000000 0.0213360809742261930965767646739550400525331497192382812500000000" rpy="0 0 0"/>
+    <parent link="link7"/>
+    <child link="link8"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link9">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint9" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link8"/>
+    <child link="link9"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link10">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh2.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh2.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint10" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link9"/>
+    <child link="link10"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link11">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint11" type="revolute">
+    <origin xyz="0.0312957522322451775487195391178829595446586608886718750000000000 0.0043720168623675613114865079467108444077894091606140136718750000 0.0023162266584321952733738214647019049152731895446777343750000000" rpy="0 0 0"/>
+    <parent link="link10"/>
+    <child link="link11"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link12">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint12" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link11"/>
+    <child link="link12"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link13">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh3.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh3.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint13" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link12"/>
+    <child link="link13"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link14">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint14" type="revolute">
+    <origin xyz="0.0210784643246286658435639793651716900058090686798095703125000000 -0.0014229663693877837166157362958074372727423906326293945312500000 -0.0002700865197102879367019312439879286102950572967529296875000000" rpy="0 0 0"/>
+    <parent link="link13"/>
+    <child link="link14"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link15">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint15" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link14"/>
+    <child link="link15"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link16">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh4.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh4.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint16" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link15"/>
+    <child link="link16"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link17">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint17" type="revolute">
+    <origin xyz="0.0921641229640089709729267042348510585725307464599609375000000000 -0.0014714351294814066034577493269352999050170183181762695312500000 -0.0033606459792244703851937792649096081731840968132019042968750000" rpy="0 0 0"/>
+    <parent link="link7"/>
+    <child link="link17"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link18">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint18" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link17"/>
+    <child link="link18"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link19">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh5.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh5.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint19" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link18"/>
+    <child link="link19"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link20">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint20" type="revolute">
+    <origin xyz="0.0299835852425348950434091932493174681439995765686035156250000000 0.0019702514775770197177906517538303887704387307167053222656250000 -0.0059467361821312755484902901059740543132647871971130371093750000" rpy="0 0 0"/>
+    <parent link="link19"/>
+    <child link="link20"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link21">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint21" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link20"/>
+    <child link="link21"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link22">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh6.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh6.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint22" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link21"/>
+    <child link="link22"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link23">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint23" type="revolute">
+    <origin xyz="0.0219019150629069757341138569017857662402093410491943359375000000 -0.0014031955284759837707109220161783014191314578056335449218750000 -0.0042427054953251101820921320495472173206508159637451171875000000" rpy="0 0 0"/>
+    <parent link="link22"/>
+    <child link="link23"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link24">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint24" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link23"/>
+    <child link="link24"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link25">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh7.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh7.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint25" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link24"/>
+    <child link="link25"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link26">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint26" type="revolute">
+    <origin xyz="0.0667476444676677604928016762642073445022106170654296875000000000 -0.0106783218829635193070082266331155551597476005554199218750000000 -0.0438576862976997466914141909910540562123060226440429687500000000" rpy="0 0 0"/>
+    <parent link="link7"/>
+    <child link="link26"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link27">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint27" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link26"/>
+    <child link="link27"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link28">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh8.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh8.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint28" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link27"/>
+    <child link="link28"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link29">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint29" type="revolute">
+    <origin xyz="0.0163406712986037538914985134397284127771854400634765625000000000 0.0004738898896550335776423068523399706464260816574096679687500000 -0.0128339635862395953780357160667335847392678260803222656250000000" rpy="0 0 0"/>
+    <parent link="link28"/>
+    <child link="link29"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link30">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint30" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link29"/>
+    <child link="link30"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link31">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh9.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh9.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint31" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link30"/>
+    <child link="link31"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link32">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint32" type="revolute">
+    <origin xyz="0.0150916108336940565926020951792452251538634300231933593750000000 -0.0008255787959469199077666701214184286072850227355957031250000000 -0.0108881966635925933606365845207619713619351387023925781250000000" rpy="0 0 0"/>
+    <parent link="link31"/>
+    <child link="link32"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link33">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint33" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link32"/>
+    <child link="link33"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link34">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh10.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh10.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint34" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link33"/>
+    <child link="link34"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link35">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint35" type="revolute">
+    <origin xyz="0.0796906463800136910524685163181857205927371978759765625000000000 -0.0043296460302798440988869543843975407071411609649658203125000000 -0.0271364331930851639118618123802662012167274951934814453125000000" rpy="0 0 0"/>
+    <parent link="link7"/>
+    <child link="link35"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link36">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint36" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link35"/>
+    <child link="link36"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link37">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh11.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh11.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint37" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link36"/>
+    <child link="link37"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link38">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint38" type="revolute">
+    <origin xyz="0.0272861509793834514092658594108797842636704444885253906250000000 0.0024666491588166972181994651691638864576816558837890625000000000 -0.0059477802240576506387359501104583614505827426910400390625000000" rpy="0 0 0"/>
+    <parent link="link37"/>
+    <child link="link38"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link39">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint39" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link38"/>
+    <child link="link39"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link40">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh12.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh12.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint40" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link39"/>
+    <child link="link40"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link41">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint41" type="revolute">
+    <origin xyz="0.0222404964182233329250681919120324891991913318634033203125000000 -0.0021602252106036026919888559660876126145012676715850830078125000 -0.0081827731233395685495057847447242238558828830718994140625000000" rpy="0 0 0"/>
+    <parent link="link40"/>
+    <child link="link41"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link42">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint42" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link41"/>
+    <child link="link42"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link43">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh13.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh13.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint43" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link42"/>
+    <child link="link43"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link44">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint44" type="revolute">
+    <origin xyz="0.0233976567254726292022226630251680035144090652465820312500000000 -0.0164538064986228839414739155699862749315798282623291015625000000 0.0261559807794267511205088538872587378136813640594482421875000000" rpy="0 0 0"/>
+    <parent link="link7"/>
+    <child link="link44"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link45">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint45" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link44"/>
+    <child link="link45"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link46">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh14.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh14.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint46" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link45"/>
+    <child link="link46"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link47">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint47" type="revolute">
+    <origin xyz="0.0188653221015116501213526589708635583519935607910156250000000000 0.0007857906586539939453039949057711055502295494079589843750000000 0.0245759256367388892461356419971707509830594062805175781250000000" rpy="0 0 0"/>
+    <parent link="link46"/>
+    <child link="link47"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link48">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint48" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link47"/>
+    <child link="link48"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link49">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh15.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh15.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint49" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link48"/>
+    <child link="link49"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link50">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint50" type="revolute">
+    <origin xyz="0.0213440221716010361530102557026111753657460212707519531250000000 -0.0058212290751058354265623506762494798749685287475585937500000000 0.0149593286469084513212735032539058011025190353393554687500000000" rpy="0 0 0"/>
+    <parent link="link49"/>
+    <child link="link50"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+  <link name="link51">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="joint51" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link50"/>
+    <child link="link51"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5707963267948965579989817342720925807952880859375000000000000000" upper="1.5707963267948965579989817342720925807952880859375000000000000000"/>
+  </joint>
+  <link name="link52">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0200000000000000004163336342344337026588618755340576171875000000"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/mesh16.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/mesh16.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="joint52" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="link51"/>
+    <child link="link52"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1415926535897931159979634685441851615905761718750000000000000000" upper="3.1415926535897931159979634685441851615905761718750000000000000000"/>
+  </joint>
+</robot>

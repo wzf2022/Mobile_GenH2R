@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!-- #####################################################################################
+#
+# Copyright (c) 2023 Galbot, Inc. All Rights Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Xacro file for arm end effector flange
+# Version: 1.0
+# Date: 2023-09-26
+# Author: Herman Ye@Galbot
+#
+##################################################################################### -->
+
+<robot name="arm_end_effector_flange" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:macro name="arm_end_effector_flange"
+        params="parent *origin  name:=arm_end_effector_flange">
+        <xacro:property name="M_PI" value="3.1415926535897931" />
+
+        <joint name="${name}_joint" type="fixed">
+            <xacro:insert_block name="origin" />
+            <parent link="${parent}" />
+            <child link="${name}_link" />
+        </joint>
+
+        <link name="${name}_link">
+            <inertial>
+                <origin
+                    xyz="4.16209483160246E-18 0.00278869455734304 1.10989195509399E-18"
+                    rpy="0 0 0" />
+                <mass
+                    value="0.0493002920412636" />
+                <inertia
+                    ixx="1.86857135099964E-05"
+                    ixy="-1.08650432728053E-22"
+                    ixz="6.86973902622073E-21"
+                    iyy="2.81507409466306E-05"
+                    iyz="5.96925628265955E-23"
+                    izz="9.79608865148053E-06" />
+            </inertial>
+            <visual>
+                <origin
+                    xyz="0 0 0"
+                    rpy="0 0 0" />
+                <geometry>
+                    <mesh
+                        filename="package://galbot_description/meshes/adapter/arm_end_effector_flange.stl" />
+                </geometry>
+                <material
+                    name="">
+                    <color
+                        rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+                </material>
+            </visual>
+            <collision>
+                <origin
+                    xyz="0 0 0"
+                    rpy="0 0 0" />
+                <geometry>
+                    <mesh
+                        filename="package://galbot_description/meshes/adapter/arm_end_effector_flange.stl" />
+                </geometry>
+            </collision>
+        </link>
+    </xacro:macro>
+</robot>

@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!-- #####################################################################################
+#
+# Copyright (c) 2023 Galbot, Inc. All Rights Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Xacro file for Galbot Zero
+# Version: 1.4.3
+# Date: 2023-12-22
+# Author: Herman Ye@Galbot
+#
+#####################################################################################
+# Revision History:
+#
+# Date       Version  Author       Description
+# 2023-09-28 1.0.0    Herman Ye    Created.
+# 2023-10-20 1.1.0    Herman Ye    Support for pybullet simulation.
+# 2023-11-06 1.2.0    Herman Ye    Add robot head.
+# 2023-11-30 1.3.0    Herman Ye    Update for new hardware.
+# 2023-12-06 1.3.1    Herman Ye    Fix frame bugs for head and base.
+# 2023-12-21 1.4.0    Herman Ye    Add long sucker and rm75-6f arm.
+# 2023-12-22 1.4.1    Herman Ye    Add long sucker sucked state tcp.
+# 2023-12-22 1.4.2    Herman Ye    Fix rm75-6f arm link7 range limit bug.
+# 2023-12-22 1.4.3    Herman Ye    Add lidar and caster swivel wheel.
+#####################################################################################-->
+
+<robot name="galbot_zero" xmlns:xacro="http://ros.org/wiki/xacro">
+    <!-- Include-->
+    <xacro:include filename="$(find galbot_description)/urdf/adapter/arm_end_effector_flange.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/adapter/gripper_inspire_flange.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/gripper/gripper_inspire.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/adapter/camera_d415_flange.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/camera/camera_d415.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/body/torsor.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/adapter/arm_base_flange.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/arm/realman_rm75.xacro" />
+    <xacro:include filename="$(find galbot_description)/urdf/arm/realman_rm75_6f.xacro" />
+    <xacro:include filename='$(find galbot_description)/urdf/chassis/hexman_chassis.xacro' />
+    <xacro:include filename='$(find galbot_description)/urdf/head/head.xacro' />
+    <xacro:include filename='$(find galbot_description)/urdf/sucker/long_sucker.xacro' />
+
+    <!-- Properties -->
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
+    <!-- Links and joints -->
+    <!-- Base Link -->
+    <link name="base_link" />
+
+    <!-- Mobility Platform -->
+    <xacro:hexman_chassis parent="base_link" name="hexman_chassis">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:hexman_chassis>
+
+    <!-- Body Torsor -->
+    <xacro:torsor parent="hexman_chassis_lift_fix_point_link" name="body_torsor">
+        <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
+    </xacro:torsor>
+
+    <!-- Head -->
+    <xacro:head parent="body_lift_link" name="head">
+        <origin rpy=" 0 0 ${M_PI} " xyz="-0.05 0 0.398"/>
+    </xacro:head>
+
+
+    <!-- Left Arm  RM75 -->
+    <xacro:realman_rm75 parent="body_lift_link" name="left_arm">
+        <!-- <origin xyz="0.0 0.0 0.0" rpy="-${M_PI/2} -${M_PI/2} 0" /> -->
+        <origin rpy="1.5708 -${M_PI/2} 0" xyz="-0.05 -0.05 0.269"/>
+    </xacro:realman_rm75>
+    <!-- Left Arm End Effector Flange -->
+    <xacro:arm_end_effector_flange parent="left_arm_link7" name="left_arm_end_effector_flange">
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+    </xacro:arm_end_effector_flange>
+
+    <!-- Left Arm Camera Flange -->
+    <xacro:camera_d415_flange parent="left_arm_end_effector_flange_link"
+        name="left_arm_camera_d415_flange">
+        <origin xyz="0 0 0" rpy="0 ${M_PI} 0" />
+    </xacro:camera_d415_flange>
+    <!-- Left Arm Camera -->
+    <xacro:arg name="use_nominal_extrinsics" default="false" />
+    <xacro:arg name="add_plug" default="true" />
+    <xacro:arg name="use_mesh" default="true" />
+    <xacro:camera_d415 parent="left_arm_end_effector_flange_link"
+        name="left_arm_camera"
+        use_nominal_extrinsics="$(arg use_nominal_extrinsics)"
+        add_plug="$(arg add_plug)" use_mesh="$(arg use_mesh)">
+        <origin rpy="${M_PI/2} 0 ${M_PI/2}" xyz="0.0935 0.01 0" />
+    </xacro:camera_d415>
+
+    <!-- Gripper Inspire Flange-->
+    <xacro:gripper_inspire_flange parent="left_arm_end_effector_flange_link">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:gripper_inspire_flange>
+    <!-- Gripper Inspire-->
+    <xacro:gripper_inspire parent="gripper_inspire_flange_link">
+        <!-- <origin xyz="0 0.012 0" rpy="${M_PI/6} 0 ${M_PI/2}" /> -->
+        <origin xyz="0 0.012 0" rpy="${-M_PI/2} ${-M_PI/2} 0" />
+    </xacro:gripper_inspire>
+
+
+
+    <!-- Right Arm RM75-6F -->
+    <xacro:realman_rm75_6f parent="body_lift_link" name="right_arm">
+        <origin rpy="-1.5708 -${M_PI/2} 0" xyz="-0.05 0.05 0.269"/>
+    </xacro:realman_rm75_6f>
+
+    <!-- Right Arm End Effector Flange -->
+    <xacro:arm_end_effector_flange parent="right_arm_link7" name="right_arm_end_effector_flange">
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+    </xacro:arm_end_effector_flange>
+
+    <!-- Right Arm Camera Flange -->
+    <xacro:camera_d415_flange parent="right_arm_end_effector_flange_link"
+        name="right_arm_camera_d415_flange">
+        <origin xyz="0 0 0" rpy="0 ${M_PI} 0" />
+    </xacro:camera_d415_flange>
+    <!-- Right Arm Camera -->
+    <xacro:arg name="use_nominal_extrinsics" default="false" />
+    <xacro:arg name="add_plug" default="true" />
+    <xacro:arg name="use_mesh" default="true" />
+    <xacro:camera_d415 parent="right_arm_end_effector_flange_link"
+        name="right_arm_camera"
+        use_nominal_extrinsics="$(arg use_nominal_extrinsics)"
+        add_plug="$(arg add_plug)" use_mesh="$(arg use_mesh)">
+        <origin rpy="${M_PI/2} 0 ${M_PI/2}" xyz="0.0935 0.01 0" />
+        <!-- <origin rpy="-${M_PI/2} 0 ${M_PI/2}" xyz="-0.0935 0.01 0" /> -->
+    </xacro:camera_d415>
+    <!-- Long sucker -->
+    <xacro:long_sucker parent="right_arm_end_effector_flange_link">
+        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 0" />
+    </xacro:long_sucker>
+
+
+</robot>

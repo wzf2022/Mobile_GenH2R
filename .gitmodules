@@ -1,0 +1,23 @@
+[submodule "third_party/Pointnet2_PyTorch"]
+	path = third_party/Pointnet2_PyTorch
+	url = git@github.com:erikwijmans/Pointnet2_PyTorch.git
+[submodule "env/third_party/orocos_kinematics_dynamics"]
+	path = env/third_party/orocos_kinematics_dynamics
+	url = git@github.com:orocos/orocos_kinematics_dynamics.git
+[submodule "env/third_party/SDFGen"]
+	path = env/third_party/SDFGen
+	url = git@github.com:christopherbatty/SDFGen.git
+[submodule "env/third_party/v-hacd"]
+	path = env/third_party/v-hacd
+	url = git@github.com:kmammou/v-hacd.git
+[submodule "env/third_party/mano_pybullet"]
+	path = env/third_party/mano_pybullet
+	url = https://github.com/ychao-nvidia/mano_pybullet.git
+	branch = handover-sim
+[submodule "env/third_party/DexGraspNet"]
+	path = env/third_party/DexGraspNet
+	url = git@github.com:chenjy2003/DexGraspNet.git
+	branch = mano
+[submodule "env/third_party/CoACD"]
+	path = env/third_party/CoACD
+	url = git@github.com:SarahWeiii/CoACD.git

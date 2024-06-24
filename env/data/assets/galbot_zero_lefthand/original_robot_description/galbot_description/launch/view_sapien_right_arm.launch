@@ -1,0 +1,35 @@
+<!-- #####################################################################################
+#
+# Copyright (c) 2023 Galbot, Inc. All Rights Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Launch file for view galbot zero right arm (Sapien Version)
+# Version: 1.0
+# Date: 2023-10-23
+# Author: Herman Ye@Galbot
+#
+##################################################################################### -->
+
+<launch>
+    <param name="robot_description"
+        command="$(find xacro)/xacro '$(find galbot_description)/urdf/sapien/galbot_zero_right_arm.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+    <arg name="gui" default="True" />
+    <param name="use_gui" value="$(arg gui)" />
+    <node
+        name="joint_state_publisher_gui"
+        pkg="joint_state_publisher_gui"
+        type="joint_state_publisher_gui" />
+    <node name="rviz" pkg="rviz" type="rviz"
+        args="-d $(find galbot_description)/rviz/sapien_right_arm_urdf.rviz" required="true" />
+</launch>

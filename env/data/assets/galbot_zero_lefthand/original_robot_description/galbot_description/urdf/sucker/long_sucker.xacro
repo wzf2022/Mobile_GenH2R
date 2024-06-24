@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<!-- #####################################################################################
+#
+# Copyright (c) 2023 Galbot, Inc. All Rights Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Xacro file for galbot zero long sucker
+# Version: 1.0
+# Date: 2023-12-21
+# Author: Herman Ye@Galbot
+#
+#####################################################################################
+# Revision History:
+#
+# Date       Version  Author       Description
+# 2023-12-21 1.0      Herman Ye    Created.
+# 2023-12-22 1.1      Herman Ye    Add sucker tcp.
+#####################################################################################-->
+
+<robot name="long_sucker" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- links and joints -->
+  <xacro:macro name="long_sucker" params="parent *origin  name:=long_sucker">
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
+    <joint name="${name}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}" />
+      <child link="${name}_base_link" />
+    </joint>
+
+    <link name="${name}_base_link">
+      <inertial>
+        <origin rpy="0 0 0" xyz="9.6761E-19 2.1789E-18 0.045815" />
+        <mass value="0.041801" />
+        <inertia ixx="2.3665E-05" ixy="-6.0121E-13" ixz="-1.9005E-21" iyy="1.8804E-05"
+          iyz="5.1127E-22" izz="1.3199E-05" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://galbot_description/meshes/sucker/long_sucker_base_link.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="1 1 1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://galbot_description/meshes/sucker/long_sucker_base_link.stl" />
+        </geometry>
+      </collision>
+    </link>
+    <link name="${name}_tool_link">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0.053681 -3.4471E-18 -1.0122E-18" />
+        <mass value="0.046846" />
+        <inertia ixx="5.9407E-06" ixy="4.4127E-22" ixz="3.6813E-22" iyy="6.5954E-05"
+          iyz="1.0667E-23" izz="6.5954E-05" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://galbot_description/meshes/sucker/long_sucker_tool_link.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="0.89804 0.91765 0.92941 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <geometry>
+          <mesh filename="package://galbot_description/meshes/sucker/long_sucker_tool_link.stl" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_tool_joint" type="fixed">
+      <!-- <origin rpy="1.5708 1.5708 0" xyz="0 0 0.2285" /> -->
+      <origin rpy="0 1.5708 0" xyz="0 0 0.2285" />
+
+      <parent link="${name}_base_link" />
+      <child link="${name}_tool_link" />
+      <axis xyz="0 0 0" />
+    </joint>
+
+    <link name="${name}_tcp_link"></link>
+    <joint name="${name}_tcp_joint" type="fixed">
+      <origin rpy="0 0 0" xyz="0.015 0 0" />
+      <parent link="${name}_tool_link" />
+      <child link="${name}_tcp_link" />
+      <axis xyz="0 0 0" />
+    </joint>
+  </xacro:macro>
+</robot>

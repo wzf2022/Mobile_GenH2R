@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!-- #####################################################################################
+#
+# Copyleft (c) 2023 Galbot, Inc. All lefts Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Xacro file for testing long sucker
+# Version: 1.0
+# Date: 2023-12-21
+# Author: Herman Ye@Galbot
+#
+##################################################################################### -->
+<robot name="test_long_sucker" xmlns:xacro="http://ros.org/wiki/xacro">
+    <!-- Include-->
+    <xacro:include filename="$(find galbot_description)/urdf/sucker/long_sucker.xacro" />
+    <!-- Properties -->
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+    <!-- Parent link -->
+    <link name="base_link" />
+    <xacro:long_sucker parent="base_link" name="long_sucker">
+        <origin xyz="0 0 0.1" rpy="0 0 0" />
+    </xacro:long_sucker>
+</robot>

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!-- #####################################################################################
+#
+# Copyright (c) 2023 Galbot, Inc. All Rights Reserved.
+#
+# This software contains confidential and proprietary information of Galbot, Inc.
+# ("Confidential Information"). You shall not disclose such Confidential Information
+# and shall use it only in accordance with the terms of the license agreement you
+# entered into with Galbot, Inc.
+#
+# UNAUTHORIZED COPYING, USE, OR DISTRIBUTION OF THIS SOFTWARE, OR ANY PORTION OR
+# DERIVATIVE THEREOF, IS STRICTLY PROHIBITED. IF YOU HAVE RECEIVED THIS SOFTWARE IN
+# ERROR, PLEASE NOTIFY GALBOT, INC. IMMEDIATELY AND DELETE IT FROM YOUR SYSTEM.
+#
+#####################################################################################
+#
+# Description: Xacro file for arm base flange
+# Version: 1.0
+# Date: 2023-09-27
+# Author: Herman Ye@Galbot
+#
+##################################################################################### -->
+
+<robot name="arm_base_flange" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:macro name="arm_base_flange"
+        params="parent *origin  name:=arm_base_flange">
+        <xacro:property name="M_PI" value="3.1415926535897931" />
+
+        <joint name="${name}_joint" type="fixed">
+            <xacro:insert_block name="origin" />
+            <parent link="${parent}" />
+            <child link="${name}_link" />
+        </joint>
+
+        <link name="${name}_link">
+            <inertial>
+              <origin
+                xyz="-7.3881E-16 -0.0050299 5.553E-05"
+                rpy="0 0 0" />
+              <mass
+                value="0.23875" />
+              <inertia
+                ixx="0.00045751"
+                ixy="4.3311E-20"
+                ixz="-8.3752E-20"
+                iyy="0.00078066"
+                iyz="-3.9686E-10"
+                izz="0.00032714" />
+            </inertial>
+            <visual>
+              <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+              <geometry>
+                <mesh
+                  filename="package://galbot_description/meshes/adapter/arm_base_flange.stl" />
+              </geometry>
+              <material
+                name="">
+                <color
+                  rgba="0.89804 0.91765 0.92941 1" />
+              </material>
+            </visual>
+            <collision>
+              <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+              <geometry>
+                <mesh
+                  filename="package://galbot_description/meshes/adapter/arm_base_flange.stl" />
+              </geometry>
+            </collision>
+          </link>
+
+    </xacro:macro>
+</robot>
