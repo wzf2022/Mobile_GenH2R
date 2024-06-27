@@ -55,7 +55,7 @@ class Humanoid(Body):
         super().__init__(bullet_client, cfg)
         self.cfg: HumanoidConfig
 
-    def reset(self, pose: NDArray[np.float32]):
+    def reset(self, pose: NDArray[np.float32], body_params: NDArray[np.float32]):
         self.base_reset()
         # config
         # self.cfg.name = name
@@ -64,6 +64,7 @@ class Humanoid(Body):
 
         # process pose data
         self.pose = pose # (num_frames, 7)
+        self.body_params = body_params
         self.num_frames = self.pose.shape[0]
 
         if self.cfg.set_human_hand_obj_last_frame:
@@ -107,6 +108,9 @@ class Humanoid(Body):
             # error_position = list(self.pose[self.frame, :3] - current_position)
             self.bullet_client.changeConstraint(self.constraintId, jointChildPivot = self.pose[self.frame, :3], jointChildFrameOrientation = self.pose[self.frame, 3:], maxForce = 50)
     
+    def get_skeleton_points(self):
+        return self.body_params[self.frame]    # (21, 3)
+
     def post_step(self):
         if self.cfg.compute_target_real_displacement:
             global max_target_real_displacement

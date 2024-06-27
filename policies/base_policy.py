@@ -77,7 +77,7 @@ class BasePolicy:
         pos = observation.world_to_ee[:3, 3]
         pos_displacement = self.cfg.goal_center-pos
 
-        print('pos', pos, self.cfg.goal_center-pos, pos_displacement, self.cfg.goal_center)
+        # print('pos', pos, self.cfg.goal_center-pos, pos_displacement, self.cfg.goal_center)
         
         if np.linalg.norm(pos_displacement) <= self.cfg.retrive_step_size:
             action_pos = pos_displacement

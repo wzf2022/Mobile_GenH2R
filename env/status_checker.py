@@ -232,6 +232,13 @@ class StatusChecker:
 
         panda_link_ind = contact_panda["link_id_b"][contact_panda["force"] > self.cfg.contact_force_thresh]
         contact_panda_fingers = set(galbot.fingers_link_id).issubset(panda_link_ind)
+
+        ### because we do not need table...
+        # target_object_pos = objects.target_object.get_link_pos(5)
+        # if target_object_pos[2] < 0.3:
+        #     self.dropped = True
+        # return self.dropped, contact_panda_fingers
+
         if len(contact_other_objects) > 0:
             contact_other_objects = np.concatenate(contact_other_objects)
             contact_other_objects = np.any(contact_other_objects["force"] > self.cfg.contact_force_thresh)
@@ -244,6 +251,9 @@ class StatusChecker:
             if self.cfg.verbose:
                 print("detect contact panda fingers")
                 if contact_other_objects: print("object drop because contact other objects")
+            self.dropped = True
+        
+        if target_object_pos[2] < 0.2:
             self.dropped = True
         return self.dropped, contact_panda_fingers
 

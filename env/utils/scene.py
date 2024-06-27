@@ -42,9 +42,17 @@ objects_dir = os.path.join(env_dir, "data", "assets", "objects")
 hand_dir = os.path.join(env_dir, "data", "assets", "hand")
 def load_scene_data(scene_id: int, table_height: float=0., stop_moving_frame: Optional[int]=None, frame_interval: int=1) -> SceneData:
     scene_dir = scene_id_to_scene_dir(scene_id)
-    # scene_data_path = os.path.join(scene_dir, f"{scene_id:08d}.npz")
     scene_data_path = os.path.join(scene_dir, f"scene_{scene_id:08d}", "pose.npy")
-    scene_mobile_data = np.load(scene_data_path, allow_pickle = True).item()  # ict_keys(['body_pose', 'body_params', 'body_joints', 'hand_pose', 'hand_joints', 'hand_params', 'obj_pose', 'scene_meta'])
+    scene_mobile_data = np.load(scene_data_path, allow_pickle = True).item()  
+    # ict_keys(['body_pose', 'body_params', 'body_joints', 'hand_pose', 'hand_joints', 'hand_params', 'obj_pose', 'scene_meta'])
+    # body_pose     (T, 7)
+    # body_params   (T, 21, 3)
+    # body_joints   (T, 144, 3)
+    # hand_pose     (T, 7)
+    # hand_joints   (T, 16, 3)
+    # hand_params   (T, 15, 3)
+    # obj_pose      (T, 60, 7)
+    # scene_meta    {'dex_key': 'WineBottle_7746997b8cfd8d11f4718731863dd64d_0.0019632731498702683index001', 'locomotion': 'straight', 'index': 14, 'hand_side': 'right', 'gmd_length': 39, 'handover_length': 21}
     # code.interact(local=dict(globals(), **locals()))
 
     scene_data = {}
@@ -61,17 +69,13 @@ def load_scene_data(scene_id: int, table_height: float=0., stop_moving_frame: Op
     scene_data["object_grasp_id"] = np.array(0)
     scene_data["object_poses"] = np.concatenate((scene_mobile_data["obj_pose"][:, :3], ros_quat_to_euler(scene_mobile_data["obj_pose"][:, 3:])), axis = 1).reshape(1, frame_num, 6)     # (1, T, 6)
     scene_data["body_pose"] = scene_mobile_data["body_pose"]  #(T, 7)
+    scene_data['body_params'] = scene_mobile_data['body_params']   #(T, 21, 3)
 
-    ## ADD FOR TEST
-    # scene_data["hand_pose"] = scene_data["hand_pose"][:, :6]
-    # scene_data["hand_path"] = os.path.join(scene_dir, f"scene_{scene_id:08d}", "model.urdf")
-    # if not os.path.exists(scene_data["hand_path"]):
-    #         shutil.copy("env/data/mobile_scene/00/00/00/scene_00000031/model.urdf", scene_data["hand_path"])
-            
+    # the fps is 20            
     scene_data["hand_pose"] = scene_data["hand_pose"].repeat(50, axis = 0)
     scene_data["object_poses"] = scene_data["object_poses"].repeat(50, axis = 1)
     scene_data["body_pose"] = scene_data["body_pose"].repeat(50, axis = 0)
-    # scene_data["hand_pose"][:, 2] += 2.6 
+    scene_data["body_params"] = scene_data["body_params"].repeat(50, axis = 0)
 
     if "endpoints" in scene_data:
         scene_data["endpoints"] //= frame_interval

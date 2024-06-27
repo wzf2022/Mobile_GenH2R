@@ -155,9 +155,11 @@ class Body:
         if self.cfg.dof_max_velocity is None:
             self.bullet_client.setJointMotorControlArray(self.body_id, self.dof_indices, pybullet.POSITION_CONTROL, **kwargs)
         else: # For Bullet, 'dof_max_velocity' has no effect when not in the POSITION_CONROL mode.
+            code.interact(local=dict(globals(), **locals()))
             kwargs["maxVelocity"] = self.cfg.dof_max_velocity
             for i, j in enumerate(self.dof_indices):
                 self.bullet_client.setJointMotorControl2(self.body_id, j, pybullet.POSITION_CONTROL, **{k: v[i] for k, v in kwargs.items()})
+                # self.bullet_client.setJointMotorControlArray(self.body_id, j, pybullet.POSITION_CONTROL, **{k: v[i] for k, v in kwargs.items()})
 
     def get_link_pos(self, link_id) -> NDArray[np.float64]:
         if self.body_id is None:

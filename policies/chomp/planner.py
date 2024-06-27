@@ -272,7 +272,7 @@ class CHOMPPlanner:
             robot_orient_loss = self.compute_robot_orient_loss(complete_traj, traj_smooth_step_size, action_repeat_frames, base_to_links[:, 3], base_to_target_object)
             # code.interact(local=dict(globals(), **locals()))
             # if self.cfg.verbose:
-            print(f"robot orient loss {robot_orient_loss};  loss {loss}")
+            # print(f"robot orient loss {robot_orient_loss};  loss {loss}")
             loss = loss + self.cfg.object_orient_loss_coef * robot_orient_loss
             # code.interact(local=dict(globals(), **locals()))
 
@@ -348,9 +348,9 @@ class CHOMPPlanner:
         # expect_robot_to_object = object_to_hand
         expect_object_to_robot_angle = np.arctan2(-expect_robot_to_object[1], -expect_robot_to_object[0])
 
-        robot_pos_angle_range = np.deg2rad(30)
-        sample_robot_angle_num = 10
-        sample_robot_radius = 0.7
+        robot_pos_angle_range = np.deg2rad(40)
+        sample_robot_angle_num = 30
+        sample_robot_radius = 0.6
         candidate_object_to_robot_angle = np.random.uniform(-robot_pos_angle_range, robot_pos_angle_range, sample_robot_angle_num) + expect_object_to_robot_angle    # (sample_angle_num)
         candidate_base_to_robot_position = sample_robot_radius * np.column_stack((np.cos(candidate_object_to_robot_angle), np.sin(candidate_object_to_robot_angle))) + base_to_target_object[:2, 3] # (sample_angle_num, 2)
         candidate_robot_rotation = candidate_object_to_robot_angle + np.pi        # (sample_angle_num)
@@ -399,7 +399,7 @@ class CHOMPPlanner:
                 candidate_joint_value[:3] = candidate_base_to_robot_position[robot_pos_sample_index][0], candidate_base_to_robot_position[robot_pos_sample_index][1], candidate_robot_rotation[robot_pos_sample_index]
                 # standoff_joint_values, ik_success, base_to_standoff_grasps = self.standoff_cartesian_to_joint(base_to_grasp, current_joint_values, expect_robot_to_object_angle)
                 standoff_joint_values, ik_success, base_to_standoff_grasps = self.standoff_cartesian_to_joint(robot_transformation_matrix[robot_pos_sample_index] @ base_to_grasp, candidate_joint_value, grasp_to_object_angle)
-                print('ik_success', ik_success)
+                # print('ik_success', ik_success)
                 if ik_success:
                     base_to_standoff_grasps = base_to_grasp@self.grasp_to_standoff_grasps
 

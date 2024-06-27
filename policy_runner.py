@@ -77,7 +77,7 @@ class PolicyRunner:
             raise NotImplementedError
         self.distributer = distributer
 
-        self.demo_array_keys = ["frame", "world_to_ee", "world_to_object", "world_to_hand", "joint_positions", "action", "world_to_target_grasp"]
+        self.demo_array_keys = ["frame", "world_to_ee", "world_to_head_camera", "world_to_object", "world_to_hand", "joint_positions", "action", "world_to_target_grasp", "body_skeleton"]
         self.np_random = np.random.RandomState()
     
     def get_dart_action(self, step: int) -> Optional[NDArray[np.float64]]:
@@ -110,14 +110,14 @@ class PolicyRunner:
         if num_points <= 1024:
             return robot_pc, hand_pc, object_pc
         
-        print(robot_pc.shape[0], hand_pc.shape[0], object_pc.shape[0])
+        # print(robot_pc.shape[0], hand_pc.shape[0], object_pc.shape[0])
         selected_idxs = np.random.choice(range(num_points), size=1024, replace=False)
         robot_pc = robot_pc[selected_idxs[selected_idxs < num_robot_pc]]
         hand_pc = hand_pc[selected_idxs[(selected_idxs >= num_robot_pc) & (selected_idxs < (num_robot_pc + num_hand_pc))] - num_robot_pc]
         object_pc = object_pc[selected_idxs[selected_idxs >= (num_robot_pc + num_hand_pc)] - num_robot_pc - num_hand_pc]
         # object_points = object_points[selected_idxs[selected_idxs<num_object_points]]
         # hand_points = hand_points[selected_idxs[selected_idxs>=num_object_points]-num_object_points]
-        print(robot_pc.shape[0], hand_pc.shape[0], object_pc.shape[0])
+        # print(robot_pc.shape[0], hand_pc.shape[0], object_pc.shape[0])
         return robot_pc, hand_pc, object_pc
 
 
@@ -130,11 +130,14 @@ class PolicyRunner:
             self.demo_data[f"robot_points_{step}"], self.demo_data[f"object_points_{step}"], self.demo_data[f"hand_points_{step}"]= self.clip_object_hand_points(*observation.get_visual_observation()[3])
             self.demo_data["frame"].append(observation.frame)
             self.demo_data["world_to_ee"].append(observation.world_to_ee)
+            self.demo_data["world_to_head_camera"].append(self.env.robot.get_world_to_head_camera())
             self.demo_data["world_to_object"].append(self.env.objects.target_object.get_world_to_obj())
             self.demo_data["world_to_hand"].append(self.env.hand.get_joint_positions())
             self.demo_data["joint_positions"].append(observation.joint_positions)
             self.demo_data["action"].append(action)
             self.demo_data["world_to_target_grasp"].append(world_to_target_grasp)
+            self.demo_data["body_skeleton"].append(self.env.humanoid.get_skeleton_points())
+            
         if demo_path is not None and self.cfg.save_state:
             scene_id = int(demo_path.split("/")[-1][:-4])
             self.env.bullet_client.saveBullet(os.path.join(os.path.dirname(demo_path), f"{scene_id}_step_{step}.bullet"))

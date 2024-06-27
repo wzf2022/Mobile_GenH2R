@@ -18,8 +18,8 @@ import  matplotlib.pyplot as plt
 @dataclass
 class GalbotConfig(BodyConfig):
     name: str = "galbot"
-    urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_zero_lefthand", "galbot_zero_lefthand.urdf")
-    # urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_one_simplified/galbot_one_10_DoF.urdf")
+    # urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_zero_lefthand", "galbot_zero_lefthand.urdf")
+    urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_one_simplified/galbot_one_10_DoF_v2.urdf")
     # collision
     use_self_collision: bool = True
     collision_mask: int = -1
@@ -116,22 +116,32 @@ class Galbot(Body):
         self.head_camera.pre_step()
         self.wrist_camera.pre_step()
     
-    def get_hand_camera_pos_orn(self):
-        # code.interact(local=dict(globals(), **locals()))
+    def get_wrist_camera_pos_orn(self):
         camera_link_state = self.bullet_client.getLinkState(self.body_id, self.wrist_camera_link_id, computeForwardKinematics=1)
+        rotation = Rt.from_euler('z', 90, degrees=True)
+        new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
+        return camera_link_state[4], new_quat
+    
         return np.array(camera_link_state[4]), np.array(camera_link_state[5])
     
-    def post_step(self):
+    def get_head_camera_pos_orn(self):
         camera_link_state = self.bullet_client.getLinkState(self.body_id, self.head_camera_link_id, computeForwardKinematics=1)
         rotation = Rt.from_euler('z', 90, degrees=True)
         new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
-        self.head_camera.update_pose(camera_link_state[4], new_quat)
+        return camera_link_state[4], new_quat
+    
+    def get_world_to_head_camera(self):
+        pos, orn = self.get_head_camera_pos_orn()
+        pose = pos_ros_quat_to_mat(pos, orn)
+        return pose
+
+    def post_step(self):
+        head_pos, head_orn = self.get_head_camera_pos_orn()
+        self.head_camera.update_pose(head_pos, head_orn)
         self.head_camera.post_step()
 
-        camera_link_state = self.bullet_client.getLinkState(self.body_id, self.wrist_camera_link_id, computeForwardKinematics=1)
-        rotation = Rt.from_euler('z', 90, degrees=True)
-        new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
-        self.wrist_camera.update_pose(camera_link_state[4], new_quat)
+        wrist_pos, wrist_orn = self.get_wrist_camera_pos_orn()
+        self.wrist_camera.update_pose(wrist_pos, wrist_orn)
         self.wrist_camera.post_step()
         # self.head_camera.update_pose((camera_link_state[4][0], camera_link_state[4][1], camera_link_state[4][2] - 0.3), (q_rotated[0], q_rotated[1], q_rotated[2], q_rotated[3]))
 
@@ -199,11 +209,12 @@ class Galbot(Body):
         return dof_target_position
 
     def get_visual_observation(self, segmentation_ids: List[int]=[]):
-        camera_link_state = self.bullet_client.getLinkState(self.body_id, self.head_camera_link_id, computeForwardKinematics=1)
+        # camera_link_state = self.bullet_client.getLinkState(self.body_id, self.head_camera_link_id, computeForwardKinematics=1)
+        # rotation = Rt.from_euler('z', 90, degrees=True)
+        # new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
 
-        rotation = Rt.from_euler('z', 90, degrees=True)
-        new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
-        self.head_camera.update_pose(camera_link_state[4], new_quat)
+        head_pos, head_orn = self.get_head_camera_pos_orn()
+        self.head_camera.update_pose(head_pos, head_orn)
 
         # self.head_camera.update_pose(camera_link_state[4], camera_link_state[5])
         color, depth, segmentation, points = self.head_camera.render(segmentation_ids)
@@ -250,6 +261,70 @@ def debug():
     
     for j in range(galbot.bullet_client.getNumJoints(galbot.body_id)):
         print(j, galbot.bullet_client.getJointInfo(galbot.body_id, j)[12].decode())
+    
+    # link_poses = galbot.get_link_poses()
+    # sphere_id = bullet_client.loadURDF("/share1/junyu/HRI/genh2r_mobile/env/data/assets/sphere/sphere.urdf", globalScaling=1.)
+    # bullet_client.resetBasePositionAndOrientation(sphere_id, (0.5, 0., 0.), (0., 0., 0., 1.))
+
+    def move_to(dof_target_position: NDArray[np.float64], steps=1) -> None:
+        dof_current_position = galbot.get_joint_positions()
+        for i in range(steps):
+            dof_target_position_i = (dof_target_position-dof_current_position)/steps*(i+1)+dof_current_position
+            for _ in range(130):
+                galbot.pre_step(dof_target_position_i)
+                bullet_client.stepSimulation()
+                galbot.post_step()
+                # time.sleep(0.003)
+            galbot.get_visual_observation()
+    # code.interact(local=dict(globals(), **locals()))
+    
+    # for i in range(len(dof_default_position)-2): # arm links
+    #     print(f"moving link {i}")
+    #     dof_target_position = dof_default_position.copy()
+    #     dof_target_position[i] += np.pi/2
+    #     move_to(dof_target_position, 100)
+    #     print(i, abs(dof_target_position[i] - galbot.get_joint_positions()[i]))
+    #     move_to(dof_default_position, 100)
+    #     print(i, abs(dof_default_position[i] - galbot.get_joint_positions()[i]))
+    print('defalut dof_default_position', dof_default_position)
+
+    for i in range(len(dof_default_position)-2): # arm links
+        print(f"\nmoving link {i}")
+        dof_target_position = galbot.get_joint_positions().copy()
+        print('current Dof', dof_target_position[i])
+        dof_target_position[i] += 0.6
+        print('expected Dof', dof_target_position[i])
+        move_to(dof_target_position, 10)
+        print('going to expected Dof, error:', i, abs(dof_target_position[i] - galbot.get_joint_positions()[i]))
+        move_to(dof_default_position, 10)
+        print('going back, error:', i, abs(dof_default_position[i] - galbot.get_joint_positions()[i]))
+
+
+    dof_target_position = dof_default_position.copy()
+    dof_target_position[7:] = 0.
+    move_to(dof_target_position) # gripper
+    move_to(dof_default_position)
+
+    for i in range(6): # cartesian action
+        pos, orn = np.array([0., 0., 0.]), np.array([0., 0., 0.])
+        if i<3:
+            pos[i] = 0.1
+        else:
+            orn[i-3] = np.pi/2
+        dof_target_position = galbot.ego_cartesian_action_to_dof_target_position(pos, orn, 0.04)
+        move_to(dof_target_position, 10) # forward
+        move_to(dof_default_position, 10) # backward
+    code.interact(local=dict(globals(), **locals()))
+
+if __name__ == "__main__":
+    debug()
+
+"""
+DISPLAY="localhost:11.0" python -m env.galbot step_time=0.001 base_position=[0.,0.,0.]
+DISPLAY="localhost:12.0" python -m env.galbot step_time=0.001 IK_solver=pybullet
+"""
+
+
     # 0 base_link_x
     # 1 base_link_y
     # 2 base_link_z
@@ -358,62 +433,3 @@ def debug():
     # 54 long_sucker_base_link
     # 55 long_sucker_tool_link
     # 56 long_sucker_tcp_link
-    
-    # link_poses = galbot.get_link_poses()
-    # sphere_id = bullet_client.loadURDF("/share1/junyu/HRI/genh2r_mobile/env/data/assets/sphere/sphere.urdf", globalScaling=1.)
-    # bullet_client.resetBasePositionAndOrientation(sphere_id, (0.5, 0., 0.), (0., 0., 0., 1.))
-
-    def move_to(dof_target_position: NDArray[np.float64], steps=1) -> None:
-        dof_current_position = galbot.get_joint_positions()
-        for i in range(steps):
-            dof_target_position_i = (dof_target_position-dof_current_position)/steps*(i+1)+dof_current_position
-            for _ in range(130):
-                galbot.pre_step(dof_target_position_i)
-                bullet_client.stepSimulation()
-                galbot.post_step()
-                # time.sleep(0.003)
-            galbot.get_visual_observation()
-    code.interact(local=dict(globals(), **locals()))
-    
-    # for i in range(len(dof_default_position)-2): # arm links
-    #     print(f"moving link {i}")
-    #     dof_target_position = dof_default_position.copy()
-    #     dof_target_position[i] += np.pi/2
-    #     move_to(dof_target_position, 100)
-    #     print(i, abs(dof_target_position[i] - galbot.get_joint_positions()[i]))
-    #     move_to(dof_default_position, 100)
-    #     print(i, abs(dof_default_position[i] - galbot.get_joint_positions()[i]))
-    
-    for i in range(len(dof_default_position)-2): # arm links
-        print(f"moving link {i}")
-        dof_target_position = galbot.get_joint_positions().copy()
-        dof_target_position[i] += np.pi/2
-        move_to(dof_target_position, 100)
-        print(i, abs(dof_target_position[i] - galbot.get_joint_positions()[i]))
-        move_to(dof_default_position, 100)
-        print(i, abs(dof_default_position[i] - galbot.get_joint_positions()[i]))
-
-
-    dof_target_position = dof_default_position.copy()
-    dof_target_position[7:] = 0.
-    move_to(dof_target_position) # gripper
-    move_to(dof_default_position)
-
-    for i in range(6): # cartesian action
-        pos, orn = np.array([0., 0., 0.]), np.array([0., 0., 0.])
-        if i<3:
-            pos[i] = 0.1
-        else:
-            orn[i-3] = np.pi/2
-        dof_target_position = galbot.ego_cartesian_action_to_dof_target_position(pos, orn, 0.04)
-        move_to(dof_target_position, 10) # forward
-        move_to(dof_default_position, 10) # backward
-    code.interact(local=dict(globals(), **locals()))
-
-if __name__ == "__main__":
-    debug()
-
-"""
-DISPLAY="localhost:11.0" python -m env.galbot step_time=0.001 base_position=[0.,0.,0.]
-DISPLAY="localhost:12.0" python -m env.galbot step_time=0.001 IK_solver=pybullet
-"""

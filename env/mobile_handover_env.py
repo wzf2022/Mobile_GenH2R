@@ -34,7 +34,7 @@ class MobileH2RSimConfig:
     table_height: float = 0.8
 
     step_time: float = 0.001
-    max_time: float = 13.0
+    max_time: float = 15.0
     stop_moving_time: Optional[float] = None
 
     max_frames: int = "${divide_to_int:${.max_time},${.step_time}}"
@@ -69,7 +69,8 @@ class MobileH2RSimConfig:
     # humanoid: HumanoidConfig = field(default_factory=HumanoidConfig)
     humanoid: HumanoidConfig = field(default_factory=lambda:HumanoidConfig(set_human_hand_obj_last_frame="${..set_human_hand_obj_last_frame}"))
 
-    third_person_camera: CameraConfig = field(default_factory=lambda: CameraConfig(width=1280, height=720, fov=60., near=0.1, far=10.0, pos=(1.5, -0.1, 1.8), target=(0.6, -0.1, 1.3), up_vector=(0., 0., 1.), step_time="${..step_time}"))
+    # third_person_camera: CameraConfig = field(default_factory=lambda: CameraConfig(width=1280, height=720, fov=60., near=0.1, far=10.0, pos=(1.5, -0.1, 1.8), target=(0.6, -0.1, 1.3), up_vector=(0., 0., 1.), step_time="${..step_time}"))
+    third_person_camera: CameraConfig = field(default_factory=lambda: CameraConfig(width=1280, height=720, fov=90., near=0.1, far=10.0, pos=(2.0, 1.5, 2.0), target=(2.0, -0.1, 1.3), up_vector=(0., 0., 1.), step_time="${..step_time}"))
     status_checker: StatusCheckerConfig = field(default_factory=lambda: StatusCheckerConfig(table_height="${..table_height}", max_frames="${..max_frames}"))
     
 
@@ -161,7 +162,7 @@ class MobileH2RSim:
             # code.interact(local=dict(globals(), **locals()))
 
             self.objects.reset(self.scene_data["object_names"], self.scene_data["object_paths"], self.scene_data["object_grasp_id"], self.scene_data["object_poses"])
-            self.humanoid.reset(self.scene_data["body_pose"])
+            self.humanoid.reset(self.scene_data["body_pose"], self.scene_data["body_params"])
             # code.interact(local=dict(globals(), **locals()))
             self.status_checker.reset()
 
@@ -278,7 +279,7 @@ class MobileH2RSim:
             with self.disable_rendering():
                 self.load_sphere(self.objects.target_object.get_world_to_obj()[:3, 3], color=(1., 0.75, 0., 1.), scale=0.1)
                 self.load_sphere(self.robot.get_tip_pos(), color=(1., 0., 0., 1.), scale=0.1)
-                self.load_sphere(self.robot.get_hand_camera_pos_orn()[0], color=(0., 1., 0., 1.), scale=0.1)
+                self.load_sphere(self.robot.get_wrist_camera_pos_orn()[0], color=(0., 1., 0., 1.), scale=0.1)
                 self.load_grasp(self.robot.get_world_to_ee(), color=(1., 0., 0., 1.))
         for _ in range(repeat):
             reward, done, info = self.sim_step(panda_dof_target_position, increase_frame)
