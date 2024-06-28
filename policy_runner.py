@@ -154,7 +154,7 @@ class PolicyRunner:
             for step in range(self.demo_data["num_steps"]):
                 del self.demo_data[f"object_points_{step}"], self.demo_data[f"hand_points_{step}"]
         np.savez(demo_path, **self.demo_data)
-        # code.interact(local=dict(globals(), **locals()))
+        code.interact(local=dict(globals(), **locals()))
         self.demo_data = {} # free the space
 
     def run(self, scene_id): # depend on init_demo_data, add_demo_data, save_demo_data

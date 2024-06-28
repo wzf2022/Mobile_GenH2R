@@ -1164,4 +1164,12 @@
     <child link="left_gripper_tcp_link"/>
     <axis xyz="0 0 0"/>
   </joint>
+
+  <link name="left_gripper_acronym_link"/>
+  <joint name="acronym_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.070"/>
+    <parent link="left_gripper_base_link"/>
+    <child link="left_gripper_acronym_link"/>
+    <axis xyz="0 0 0"/>
+  </joint>
 </robot>

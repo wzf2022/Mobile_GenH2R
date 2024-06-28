@@ -76,8 +76,9 @@ class CHOMPPlannerConfig:
     standoff_dist: float = 0.064
 
     traj: TrajectoryConfig = field(default_factory=lambda: TrajectoryConfig(fix_end="${..fix_end}", device="${..device}"))
+    robot_kinematics: RobotKinematicsConfig = field(default_factory=lambda: RobotKinematicsConfig(urdf_file="env/data/assets/galbot_one_simplified/galbot_one_7_DoF.urdf", chain_tip="left_gripper_acronym_link"))
     # robot_kinematics: RobotKinematicsConfig = field(default_factory=lambda: RobotKinematicsConfig(urdf_file="env/data/assets/galbot_one_simplified/galbot_one_7_DoF.urdf", chain_tip="left_gripper_base_link"))
-    robot_kinematics: RobotKinematicsConfig = field(default_factory=lambda: RobotKinematicsConfig(urdf_file="env/data/assets/galbot_zero_lefthand/galbot_zero_lefthand_static.urdf", chain_tip="left_arm_link7"))
+    # robot_kinematics: RobotKinematicsConfig = field(default_factory=lambda: RobotKinematicsConfig(urdf_file="env/data/assets/galbot_zero_lefthand/galbot_zero_lefthand_static.urdf", chain_tip="left_arm_link7"))
 
     fix_end: bool = False
     end_loss_coef: float = 1.

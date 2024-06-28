@@ -279,7 +279,15 @@ class MobileH2RSim:
             with self.disable_rendering():
                 self.load_sphere(self.objects.target_object.get_world_to_obj()[:3, 3], color=(1., 0.75, 0., 1.), scale=0.1)
                 self.load_sphere(self.robot.get_tip_pos(), color=(1., 0., 0., 1.), scale=0.1)
-                self.load_sphere(self.robot.get_wrist_camera_pos_orn()[0], color=(0., 1., 0., 1.), scale=0.1)
+                self.load_sphere(np.array(self.robot.get_wrist_camera_pos_orn()[0]), color=(0., 1., 0., 1.), scale=0.1)
+                # camera_trans, camera_orn = self.robot.get_wrist_camera_pos_orn()
+                # camera_orn_matrix = Rt.from_quat(camera_orn).as_matrix()
+                # camera_trans = np.array(camera_trans)
+                # code.interact(local=dict(globals(), **locals()))
+                # self.load_sphere(camera_trans + 0.1 * camera_orn_matrix[:, 0], color=(1., 0., 0., 1.), scale=0.1)
+                # self.load_sphere(camera_trans + 0.1 * camera_orn_matrix[:, 1], color=(0., 1., 0., 1.), scale=0.1)
+                # self.load_sphere(camera_trans + 0.1 * camera_orn_matrix[:, 2], color=(0.5, 0.5, 0.5, 1.), scale=0.1)
+                # self.load_sphere(camera_trans, color=(0., 0., 1., 1.), scale=0.1)
                 self.load_grasp(self.robot.get_world_to_ee(), color=(1., 0., 0., 1.))
         for _ in range(repeat):
             reward, done, info = self.sim_step(panda_dof_target_position, increase_frame)

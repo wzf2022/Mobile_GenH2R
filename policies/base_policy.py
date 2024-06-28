@@ -55,7 +55,8 @@ class BasePolicy:
             self.grasped = True
             if self.last_action_type == "joint":
                 action, action_type = self.last_action, self.last_action_type
-                action[-2:] = np.array([-0.035, 0.035])
+                # action[-2:] = np.array([-0.035, 0.035])
+                action[-2:] = np.array([0.0, 0.0])
             else:
                 raise NotImplementedError
             repeat, stage, info = self.close_gripper_steps, "grasp", {}
@@ -69,7 +70,8 @@ class BasePolicy:
         # Retreat
         if self.retreat_step < self.cfg.retreat_steps:
             self.retreat_step += 1
-            action = np.array([0., 0., -self.cfg.retreat_step_size, 0., 0., 0., -0.035, 0.035])
+            # action = np.array([0., 0., -self.cfg.retreat_step_size, 0., 0., 0., -0.035, 0.035])
+            action = np.array([0., 0., -self.cfg.retreat_step_size, 0., 0., 0., 0.0, 0.0])
             action_type, repeat, stage, info = "ego_cartesian", self.action_repeat_steps, "retreat", {}
             return action, action_type, repeat, stage, info
 
@@ -83,7 +85,8 @@ class BasePolicy:
             action_pos = pos_displacement
         else:
             action_pos = pos_displacement/np.linalg.norm(pos_displacement)*self.cfg.retrive_step_size
-        action, action_type, repeat, stage, info = np.append(action_pos, [-0.035, 0.035]), "world_pos", self.action_repeat_steps, "retrieve", {}
+        # action, action_type, repeat, stage, info = np.append(action_pos, [-0.035, 0.035]), "world_pos", self.action_repeat_steps, "retrieve", {}
+        action, action_type, repeat, stage, info = np.append(action_pos, [-0.0, 0.0]), "world_pos", self.action_repeat_steps, "retrieve", {}
         return action, action_type, repeat, stage, info
 
 class DebugPolicy(BasePolicy):

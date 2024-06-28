@@ -1059,7 +1059,7 @@
       <mass value="0.25733"/>
       <inertia ixx="0.0002175" ixy="-2.5433E-06" ixz="4.0586E-06" iyy="5.3894E-05" iyz="-1.8533E-06" izz="0.00025319"/>
     </inertial>
-    <visual>
+    <!-- <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="meshes/camera/arm_camera.stl"/>
@@ -1073,7 +1073,7 @@
       <geometry>
         <mesh filename="meshes/camera/arm_camera.stl"/>
       </geometry>
-    </collision>
+    </collision> -->
   </link>
   <joint name="left_gripper_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1103,6 +1103,13 @@
     </collision>
   </link>
   <link name="left_gripper_left_link">
+    <contact>
+        <friction_anchor/>
+        <stiffness value="30000.0"/>
+        <damping value="1000.0"/>
+        <spinning_friction value="0.1"/>
+        <lateral_friction value="5.0"/>
+    </contact>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.0231481638496937 -4.90112376816481E-07 -0.000267991935875532"/>
       <mass value="0.00675449578859124"/>
@@ -1132,6 +1139,13 @@
     <limit effort="2" lower="0.005" upper="0.05" velocity="0.045"/>
   </joint>
   <link name="left_gripper_right_link">
+    <contact>
+            <friction_anchor/>
+            <stiffness value="30000.0"/>
+            <damping value="1000.0"/>
+            <spinning_friction value="0.1"/>
+            <lateral_friction value="5.0"/>
+        </contact>
     <inertial>
       <origin rpy="0 0 0" xyz="-0.0231481638496943 -4.90112376734401E-07 -0.000267991935824489"/>
       <mass value="0.00675449578859123"/>
@@ -1170,4 +1184,13 @@
     <child link="left_gripper_tcp_link"/>
     <axis xyz="0 0 0"/>
   </joint>
+
+  <link name="left_gripper_acronym_link"/>
+  <joint name="acronym_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.070"/>
+    <parent link="left_gripper_base_link"/>
+    <child link="left_gripper_acronym_link"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
 </robot>

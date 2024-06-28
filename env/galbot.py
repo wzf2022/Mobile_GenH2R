@@ -18,8 +18,8 @@ import  matplotlib.pyplot as plt
 @dataclass
 class GalbotConfig(BodyConfig):
     name: str = "galbot"
-    urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_zero_lefthand", "galbot_zero_lefthand.urdf")
-    # urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_one_simplified/galbot_one_10_DoF.urdf")
+    # urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_zero_lefthand", "galbot_zero_lefthand.urdf")
+    urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_one_simplified/galbot_one_10_DoF.urdf")
     # collision
     use_self_collision: bool = True
     collision_mask: int = -1
@@ -30,12 +30,12 @@ class GalbotConfig(BodyConfig):
     # links
     num_dofs: int = 12
     # dof_default_position: Tuple[float] = (0., 0., 0., 0., np.pi/3, -np.pi/2, -2*np.pi/3, 0., np.pi/3, 0., 0.01, -0.01)
-    dof_default_position: Tuple[float] = (0., 0., 0., 
-                                          0., -1.571, -1.571, -1.571, -3.0, 0., 0.,
-                                            0.01, -0.01)
     # dof_default_position: Tuple[float] = (0., 0., 0., 
-    #                                       2.972, 1.422, -0.551, 2.00, 0.059, -0.667, -0.052,
-    #                                         0.05, 0.05)
+    #                                       0., -1.571, -1.571, -1.571, -3.0, 0., 0.,
+    #                                         0.01, -0.01)
+    dof_default_position: Tuple[float] = (0., 0., 0., 
+                                          2.972, 1.422, -0.551, 2.00, 0.059, -0.667, -0.052,
+                                            0.05, 0.05)
     # dof_default_position: Tuple[float] = (0.95581754, 0.26486026, -0.42207467,
     #                                       0.28342464, 1.24447524, 0.5107008, 1.1955415, -1.28844111, 1.47269412, -0.90335175, 
     #                                       0.05, 0.05)
@@ -59,7 +59,7 @@ class GalbotConfig(BodyConfig):
         urdf_file="${..urdf_file}",
         IK_solver_max_iter="${..IK_solver_max_iter}", 
         IK_solver_eps="${..IK_solver_eps}",
-        chain_tip="left_arm_link7",               # left_arm_link7(31),  gripper_inspire_tcp_frame(40)
+        chain_tip="left_gripper_acronym_link",               # left_arm_link7(31),  gripper_inspire_tcp_frame(40)
         # left_gripper_tcp_link   48
         # left_gripper_base_link   45
         # left_arm_link7        41
@@ -69,12 +69,14 @@ class Galbot(Body):
     def __init__(self, bullet_client: BulletClient, cfg: GalbotConfig):
         super().__init__(bullet_client, cfg)
         self.cfg: GalbotConfig
-        self.ee_link_id = 31              # 40
-        # self.ee_link_id = 45
-        self.fingers_link_id = (38, 39)
-        # self.fingers_link_id = (46, 47)
-        self.head_camera_link_id = 22                 # head_camera_normal_frame 22     head_camera_optical_frame 23 
-        self.wrist_camera_link_id = 35
+        # self.ee_link_id = 31              # 40
+        self.ee_link_id = 49
+        # self.fingers_link_id = (38, 39)
+        self.fingers_link_id = (46, 47)
+        # self.head_camera_link_id = 22                 # head_camera_normal_frame 22     head_camera_optical_frame 23 
+        # self.wrist_camera_link_id = 35
+        self.head_camera_link_id = 50                 
+        self.wrist_camera_link_id = 50
         self.world_to_base = pos_ros_quat_to_mat(cfg.base_position, cfg.base_orientation)
         self.base_to_world = se3_inverse(self.world_to_base)
 
@@ -119,7 +121,8 @@ class Galbot(Body):
     def get_wrist_camera_pos_orn(self):
         camera_link_state = self.bullet_client.getLinkState(self.body_id, self.wrist_camera_link_id, computeForwardKinematics=1)
         rotation = Rt.from_euler('z', 90, degrees=True)
-        new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
+        # new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
+        new_quat = (Rt.from_quat(np.array(camera_link_state[5])) * rotation).as_quat()
         return camera_link_state[4], new_quat
     
         return np.array(camera_link_state[4]), np.array(camera_link_state[5])
@@ -127,7 +130,8 @@ class Galbot(Body):
     def get_head_camera_pos_orn(self):
         camera_link_state = self.bullet_client.getLinkState(self.body_id, self.head_camera_link_id, computeForwardKinematics=1)
         rotation = Rt.from_euler('z', 90, degrees=True)
-        new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
+        # new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
+        new_quat = (Rt.from_quat(np.array(camera_link_state[5])) * rotation).as_quat()
         return camera_link_state[4], new_quat
     
     def get_world_to_head_camera(self):
@@ -324,7 +328,7 @@ DISPLAY="localhost:11.0" python -m env.galbot step_time=0.001 base_position=[0.,
 DISPLAY="localhost:12.0" python -m env.galbot step_time=0.001 IK_solver=pybullet
 """
 
-
+    # right
     # 0 base_link_x
     # 1 base_link_y
     # 2 base_link_z
@@ -374,8 +378,10 @@ DISPLAY="localhost:12.0" python -m env.galbot step_time=0.001 IK_solver=pybullet
     # 46 left_gripper_left_link
     # 47 left_gripper_right_link
     # 48 left_gripper_tcp_link
-    # 49 left_arm_camera_flange_link
-
+    # 49 left_gripper_acronym_link
+    # 50 left_arm_camera_flange_link
+    
+    # old
     # 0 base_link_x
     # 1 base_link_y
     # 2 base_link_z
