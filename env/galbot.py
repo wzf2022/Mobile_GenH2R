@@ -18,8 +18,8 @@ import  matplotlib.pyplot as plt
 @dataclass
 class GalbotConfig(BodyConfig):
     name: str = "galbot"
-    # urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_zero_lefthand", "galbot_zero_lefthand.urdf")
-    urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_one_simplified/galbot_one_10_DoF_v2.urdf")
+    urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_zero_lefthand", "galbot_zero_lefthand.urdf")
+    # urdf_file: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "assets", "galbot_one_simplified/galbot_one_10_DoF.urdf")
     # collision
     use_self_collision: bool = True
     collision_mask: int = -1

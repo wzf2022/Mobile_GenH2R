@@ -66,8 +66,9 @@ class Body:
         # assert self.body_id is None
 
         kwargs = {}
-        if self.cfg.use_self_collision:
-            kwargs["flags"] = pybullet.URDF_USE_SELF_COLLISION
+        # if self.cfg.use_self_collision:
+            # kwargs["flags"] = pybullet.URDF_USE_SELF_COLLISION
+            # kwargs["flags"] = pybullet.URDF_USE
         kwargs["useFixedBase"] = self.cfg.use_fixed_base
         if self.cfg.scale != 1.:
             kwargs["globalScaling"] = self.cfg.scale
@@ -158,6 +159,7 @@ class Body:
             code.interact(local=dict(globals(), **locals()))
             kwargs["maxVelocity"] = self.cfg.dof_max_velocity
             for i, j in enumerate(self.dof_indices):
+                code.interact(local=dict(globals(), **locals()))
                 self.bullet_client.setJointMotorControl2(self.body_id, j, pybullet.POSITION_CONTROL, **{k: v[i] for k, v in kwargs.items()})
                 # self.bullet_client.setJointMotorControlArray(self.body_id, j, pybullet.POSITION_CONTROL, **{k: v[i] for k, v in kwargs.items()})
 
