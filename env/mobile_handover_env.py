@@ -277,9 +277,11 @@ class MobileH2RSim:
             print("")
         if self.cfg.show_trajectory:
             with self.disable_rendering():
-                self.load_sphere(self.objects.target_object.get_world_to_obj()[:3, 3], color=(1., 0.75, 0., 1.), scale=0.1)
-                self.load_sphere(self.robot.get_tip_pos(), color=(1., 0., 0., 1.), scale=0.1)
+                # self.load_sphere(self.objects.target_object.get_world_to_obj()[:3, 3], color=(1., 0.75, 0., 1.), scale=0.1)
+                # self.load_sphere(self.robot.get_tip_pos(), color=(1., 0., 0., 1.), scale=0.1)
                 self.load_sphere(np.array(self.robot.get_wrist_camera_pos_orn()[0]), color=(0., 1., 0., 1.), scale=0.1)
+                # self.load_sphere(np.array(self.robot.get_wrist_camera_pos_orn()[0]) + np.array([0.15, 0, 0]), color=(1., 0., 0., 1.), scale=0.1)
+                # self.load_sphere(np.array(self.robot.get_head_camera_pos_orn()[0]), color=(1., 0., 0., 1.), scale=0.1)
                 # camera_trans, camera_orn = self.robot.get_wrist_camera_pos_orn()
                 # camera_orn_matrix = Rt.from_quat(camera_orn).as_matrix()
                 # camera_trans = np.array(camera_trans)

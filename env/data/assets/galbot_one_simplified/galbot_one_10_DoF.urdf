@@ -1193,4 +1193,24 @@
     <axis xyz="0 0 0"/>
   </joint>
 
+  <link name="left_arm_camera_color_optical_frame"/>
+  <joint name="left_arm_camera_joint_calibration" type="fixed">
+    <origin xyz="-0.03723097546064943 0.057109830265918086 0.024428711356245303"
+          rpy="0.26058160947492603 0.0012649375988844636 -2.042211434373371"/>
+    <parent link="left_arm_end_effector_mount_link"/>
+    <child link="left_arm_camera_color_optical_frame"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+
+  <link name="front_head_camera_color_optical_frame"/>
+  <joint name="front_camera_joint_calibration" type="fixed">
+    <origin xyz="0.07244318503551352 0.2536318547766252 -0.17073446195851838"
+          rpy="2.8390350174780554 -1.5371566014113576 -0.13187440313966659"/>
+    <parent link="right_arm_base_link"/>
+    <child link="front_head_camera_color_optical_frame"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+
 </robot>

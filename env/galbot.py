@@ -70,13 +70,13 @@ class Galbot(Body):
         super().__init__(bullet_client, cfg)
         self.cfg: GalbotConfig
         # self.ee_link_id = 31              # 40
-        self.ee_link_id = 49
+        self.ee_link_id = 50
         # self.fingers_link_id = (38, 39)
-        self.fingers_link_id = (46, 47)
+        self.fingers_link_id = (47, 48)
         # self.head_camera_link_id = 22                 # head_camera_normal_frame 22     head_camera_optical_frame 23 
         # self.wrist_camera_link_id = 35
-        self.head_camera_link_id = 50                 
-        self.wrist_camera_link_id = 50
+        self.head_camera_link_id = 33                 
+        self.wrist_camera_link_id = 52
         self.world_to_base = pos_ros_quat_to_mat(cfg.base_position, cfg.base_orientation)
         self.base_to_world = se3_inverse(self.world_to_base)
 
@@ -120,7 +120,8 @@ class Galbot(Body):
     
     def get_wrist_camera_pos_orn(self):
         camera_link_state = self.bullet_client.getLinkState(self.body_id, self.wrist_camera_link_id, computeForwardKinematics=1)
-        rotation = Rt.from_euler('z', 90, degrees=True)
+        return camera_link_state[4], camera_link_state[5]
+        # rotation = Rt.from_euler('z', -90, degrees=True)
         # new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
         new_quat = (Rt.from_quat(np.array(camera_link_state[5])) * rotation).as_quat()
         return camera_link_state[4], new_quat
@@ -129,7 +130,8 @@ class Galbot(Body):
     
     def get_head_camera_pos_orn(self):
         camera_link_state = self.bullet_client.getLinkState(self.body_id, self.head_camera_link_id, computeForwardKinematics=1)
-        rotation = Rt.from_euler('z', 90, degrees=True)
+        return camera_link_state[4], camera_link_state[5]
+        # rotation = Rt.from_euler('z', -90, degrees=True)
         # new_quat = (rotation * Rt.from_quat(np.array(camera_link_state[5]))).as_quat()
         new_quat = (Rt.from_quat(np.array(camera_link_state[5])) * rotation).as_quat()
         return camera_link_state[4], new_quat
@@ -362,24 +364,27 @@ DISPLAY="localhost:12.0" python -m env.galbot step_time=0.001 IK_solver=pybullet
     # 30 right_suction_cup_link1
     # 31 right_suction_cup_tcp_link
     # 32 right_arm_camera_flange_link
-    # 33 torso_left_arm_mount_link
-    # 34 left_arm_base_link
-    # 35 left_arm_link1
-    # 36 left_arm_link2
-    # 37 left_arm_link3
-    # 38 left_arm_link4
-    # 39 left_arm_link5
-    # 40 left_arm_link6
-    # 41 left_arm_link7
-    # 42 left_arm_end_effector_mount_link
-    # 43 left_flange_base_link
-    # 44 left_flange_mount_link
-    # 45 left_gripper_base_link
-    # 46 left_gripper_left_link
-    # 47 left_gripper_right_link
-    # 48 left_gripper_tcp_link
-    # 49 left_gripper_acronym_link
-    # 50 left_arm_camera_flange_link
+    # 33 front_head_camera_color_optical_frame
+    # 34 torso_left_arm_mount_link
+    # 35 left_arm_base_link
+    # 36 left_arm_link1
+    # 37 left_arm_link2
+    # 38 left_arm_link3
+    # 39 left_arm_link4
+    # 40 left_arm_link5
+    # 41 left_arm_link6
+    # 42 left_arm_link7
+    # 43 left_arm_end_effector_mount_link
+    # 44 left_flange_base_link
+    # 45 left_flange_mount_link
+    # 46 left_gripper_base_link
+    # 47 left_gripper_left_link
+    # 48 left_gripper_right_link
+    # 49 left_gripper_tcp_link
+    # 50 left_gripper_acronym_link
+    # 51 left_arm_camera_flange_link
+    # 52 left_arm_camera_color_optical_frame
+
     
     # old
     # 0 base_link_x
