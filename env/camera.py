@@ -44,6 +44,8 @@ class CameraConfig:
         if self.pos is not None and self.orn is not None:
             assert self.target is None and self.up_vector is None
             urdf_to_opengl = Rt.from_euler("XYZ", (-np.pi/2, 0.0, -np.pi)).as_matrix()
+            urdf_to_opengl = Rt.from_euler("XYZ", (np.pi, 0.0, 0.0)).as_matrix()
+            # code.interact(local=dict(globals(), **locals()))
             R = Rt.from_quat(self.orn).as_matrix()@urdf_to_opengl
             t = -np.array(self.pos).dot(R)
             view_matrix = np.eye(4, dtype=float)

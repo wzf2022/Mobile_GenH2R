@@ -6,4 +6,6 @@ CUDA_VISIBLE_DEVICES=0 python -m evaluate setup=m0 split=train start_object_idx=
 
 
 python -m  env.galbot step_time=0.001
-1
+
+
+code.interact(local=dict(globals(), **locals()))
