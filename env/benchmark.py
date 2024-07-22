@@ -91,6 +91,6 @@ def get_scene_ids(setup: str, split: str, start_object_idx: Optional[int]=None, 
         return get_genh2rsim_scene_ids(setup, split, start_object_idx, end_object_idx, start_traj_idx, end_traj_idx)
     elif setup in ["m0"]:
         # return np.arange(10000, 12149).tolist()
-        return np.arange(10000, 10100).tolist()
+        return np.arange(10000, 12000).tolist()      ### [10000, 12150]
     else:
         raise ValueError(setup)

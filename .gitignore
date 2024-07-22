@@ -2,6 +2,8 @@ __pycache__
 env/data/assets/objects
 env/data/*mask
 env/data/*scene
+env/data/models
+data
 log
 tmp
 *.bullet

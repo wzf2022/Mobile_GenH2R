@@ -57,6 +57,8 @@ class BasePolicy:
                 action, action_type = self.last_action, self.last_action_type
                 # action[-2:] = np.array([-0.035, 0.035])
                 action[-2:] = np.array([0.0, 0.0])
+            elif self.last_action_type == "ego_cartesian_robot_body":
+                action, action_type= np.zeros(11), self.last_action_type
             else:
                 raise NotImplementedError
             repeat, stage, info = self.close_gripper_steps, "grasp", {}

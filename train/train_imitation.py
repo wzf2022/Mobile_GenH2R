@@ -61,7 +61,7 @@ class ImitationTrainer:
 
         if cfg.wandb:
             self.run = wandb.init(
-                project="genh2r_release",
+                project="Mobile_GenH2R",
                 config=cfg,
                 name=cfg.run_dir,
                 group=cfg.run_dir[:cfg.run_dir.rfind("_")],

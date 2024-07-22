@@ -22,8 +22,8 @@ class GenerateHandCollisionFreeMaskConfig:
     device: str = "cuda"
     num_runners: int = 32
 
-    start_scene_id: int = 10000
-    end_scene_id: int = 12150
+    start_scene_id: int = 20000 # 10000
+    end_scene_id: int = 22150   # 22149
 
     augment_grasps: bool = True
     frame: int = 0

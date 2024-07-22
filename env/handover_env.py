@@ -73,6 +73,7 @@ class Observation:
     world_to_ee: NDArray[np.float64]
     joint_positions: NDArray[np.float64]
     get_visual_observation: "GenH2RSim.get_visual_observation"
+    get_wrist_visual_observation: "GenH2RSim.get_wrist_visual_observation"
     env: "GenH2RSim"
 
 class GenH2RSim:

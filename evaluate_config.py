@@ -48,7 +48,8 @@ class EvaluateConfig:
     show_target_grasp: bool = False
     verbose: bool = False
     mask_robot_pc: bool = True
-    
+    demo_failure_time : int = 1
+
     env: MobileH2RSimConfig = field(default_factory=MobileH2RSimConfig)
     offline: OfflinePolicyConfig = field(default_factory=lambda: OfflinePolicyConfig(**policy_default_kwargs))
     omg_planner: OMGPlannerPolicyConfig = field(default_factory=lambda: OMGPlannerPolicyConfig(

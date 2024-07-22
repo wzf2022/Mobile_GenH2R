@@ -230,6 +230,9 @@ class CHOMPPolicy(BasePolicy):
             elif self.cfg.action_type == "ego_cartesian":
                 action = np.zeros(7)
                 action_type = "ego_cartesian"
+            elif self.cfg.action_type == "ego_cartesian_robot_body":
+                action = np.zeros(11)
+                action_type = "ego_cartesian_robot_body"
             else:
                 raise ValueError(f"action type {self.cfg.action_type} is not supported")
         elif self.step == self.traj.shape[0]:
@@ -245,6 +248,42 @@ class CHOMPPolicy(BasePolicy):
                 action = np.concatenate([*mat_to_pos_euler(ee_to_target_ee), [0.]])
                 # print(f"action step length: {np.linalg.norm(action[:3])}")
                 action_type, reached = "ego_cartesian", False
+            elif self.cfg.action_type == "ego_cartesian_robot_body":
+                # base_to_all_links = self.planner.robot_kinematics.joint_to_cartesian_for_all_links(self.traj[self.step, :10])
+                robot_current_joint_position = observation.joint_positions
+                delta_x_y_theta = self.traj[self.step, :3] - robot_current_joint_position[:3]
+                
+                # code.interact(local=dict(globals(), **locals()))
+                ## current x   (cos\theta, sin\theta)
+                ## current y   (-sin\theta, cos\theta)
+                current_to_next_position = self.traj[self.step, :2] - robot_current_joint_position[:2]
+                current_x = np.array((np.cos(robot_current_joint_position[2]), np.sin(robot_current_joint_position[2])))
+                current_y = np.array((-np.sin(robot_current_joint_position[2]), np.cos(robot_current_joint_position[2])))
+                delta_x = current_to_next_position.dot(current_x)
+                delta_y = current_to_next_position.dot(current_y)
+                delta_theta = self.traj[self.step, 2] - robot_current_joint_position[2]
+                delta_x_y_theta = [delta_x, delta_y, delta_theta]
+
+                # next_x = robot_current_joint_position[0] + current_x[0] * delta_x + current_y[0] * delta_y
+                # next_y = robot_current_joint_position[1] + current_x[1] * delta_x + current_y[1] * delta_y
+                # next_theta = robot_current_joint_position[2] + delta_theta
+                # print('diff', self.traj[self.step, :3] - [next_x, next_y, next_theta])
+                # code.interact(local=dict(globals(), **locals()))
+
+                # current_robot_base_to_ee_1 = observation.env.robot.robot_base_to_ee()
+                # current_robot_base_to_ee_2 = self.planner.robot_kinematics.joint_to_cartesian(robot_current_joint_position[3:10])
+                current_robot_base_to_ee = self.planner.robot_kinematics.joint_to_cartesian(robot_current_joint_position[3:10])
+                target_robot_base_to_ee = self.planner.robot_kinematics.joint_to_cartesian(self.traj[self.step, 3:10])
+                ee_to_target_ee = se3_inverse(current_robot_base_to_ee)@target_robot_base_to_ee    # (6)
+                action = np.concatenate([delta_x_y_theta, *mat_to_pos_euler(ee_to_target_ee), [0.05, 0.05]])   # (x, y, theta, arm_pos, arm_orn, 0.05, 0.05)
+
+                print('expect joint position', self.traj[self.step])
+                # code.interact(local=dict(globals(), **locals()))
+
+                # action = self.traj[self.step]
+                action_type, reached = "ego_cartesian_robot_body", False
+                # action_type, reached = "joint", False
+
             else:
                 raise ValueError(f"action type {self.cfg.action_type} is not supported")
             self.step += 1

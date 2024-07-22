@@ -77,7 +77,8 @@ class PolicyRunner:
             raise NotImplementedError
         self.distributer = distributer
 
-        self.demo_array_keys = ["frame", "world_to_ee", "world_to_head_camera", "world_to_object", "world_to_hand", "joint_positions", "action", "world_to_target_grasp", "body_skeleton"]
+        self.demo_array_keys = ["frame", "world_to_ee", "world_to_head_camera", "world_to_object", "world_to_hand", "world_to_torso", "world_to_robot_base", "world_to_wrist_camera", 
+        "joint_positions", "action", "world_to_target_grasp", "body_skeleton"]
         self.np_random = np.random.RandomState()
     
     def get_dart_action(self, step: int) -> Optional[NDArray[np.float64]]:
@@ -127,10 +128,17 @@ class PolicyRunner:
             self.demo_data[f"dart_action_{step}"] = dart_action
         if stage == "reach":
             self.demo_data["num_steps"] += 1
-            self.demo_data[f"robot_points_{step}"], self.demo_data[f"object_points_{step}"], self.demo_data[f"hand_points_{step}"]= self.clip_object_hand_points(*observation.get_visual_observation()[3])
+            self.demo_data[f"robot_points_{step}"], self.demo_data[f"hand_points_{step}"], self.demo_data[f"object_points_{step}"] = self.clip_object_hand_points(*observation.get_visual_observation()[3])
+            self.demo_data[f"wrist_robot_points_{step}"], self.demo_data[f"wrist_hand_points_{step}"], self.demo_data[f"wrist_object_points_{step}"] = self.clip_object_hand_points(*observation.get_wrist_visual_observation()[3])
             self.demo_data["frame"].append(observation.frame)
             self.demo_data["world_to_ee"].append(observation.world_to_ee)
+            # self.demo_data["world_to_head_camera"].append(self.env.robot.get_world_to_head_camera())
+            # self.demo_data["world_to_wrist_camera"].append(self.env.robot.get_world_to_head_camera())
+            # code.interact(local=dict(globals(), **locals()))
+            # self.demo_data[f"robot_points_{step}_2"], self.demo_data[f"object_points_{step}_2"], self.demo_data[f"hand_points_{step}_2"]= self.clip_object_hand_points(*self.env.get_visual_observation()[3])
             self.demo_data["world_to_head_camera"].append(self.env.robot.get_world_to_head_camera())
+            self.demo_data["world_to_wrist_camera"].append(self.env.robot.get_world_to_wrist_camera())
+            self.demo_data["world_to_robot_base"].append(self.env.robot.get_world_to_robot_base())
             self.demo_data["world_to_object"].append(self.env.objects.target_object.get_world_to_obj())
             self.demo_data["world_to_hand"].append(self.env.hand.get_joint_positions())
             self.demo_data["joint_positions"].append(observation.joint_positions)
@@ -152,9 +160,10 @@ class PolicyRunner:
         self.demo_data.update({"status": status, "reward": reward, "reached_frame": reached_frame, "done_frame": done_frame})
         if status != EpisodeStatus.SUCCESS:
             for step in range(self.demo_data["num_steps"]):
-                del self.demo_data[f"object_points_{step}"], self.demo_data[f"hand_points_{step}"]
+                pass
+                # del self.demo_data[f"object_points_{step}"], self.demo_data[f"hand_points_{step}"]
         np.savez(demo_path, **self.demo_data)
-        code.interact(local=dict(globals(), **locals()))
+        # code.interact(local=dict(globals(), **locals()))
         self.demo_data = {} # free the space
 
     def run(self, scene_id): # depend on init_demo_data, add_demo_data, save_demo_data
@@ -215,6 +224,8 @@ class PolicyRunner:
                 reward, done, info = self.env.joint_step(action, repeat)
             elif action_type == "ego_cartesian":
                 reward, done, info = self.env.ego_cartesian_step(action, repeat)
+            elif action_type == "ego_cartesian_robot_body":
+                reward, done, info = self.env.robot_base_ego_cartesian_step(action, repeat)
             elif action_type == "world_pos":
                 reward, done, info = self.env.world_pos_step(action, repeat)
             else:
@@ -240,19 +251,24 @@ class PolicyRunner:
         while True:
             scene_id = ray.get(self.distributer.get_next_task.remote())
             if scene_id is None: break
-            result: NDArray[result_dtype] = np.empty((1, ), dtype=result_dtype)
-            result["scene_id"] = scene_id
-            demo_data_existed = False
-            if self.cfg.demo_dir is not None:
-                demo_path = os.path.join(self.cfg.demo_dir, scene_id_to_demo_path(scene_id, self.cfg.demo_structure))
-                if os.path.exists(demo_path):
-                    demo_data_existed = True
-            if demo_data_existed and not self.cfg.overwrite_demo:
-                demo_data = np.load(demo_path)
-                result["status"], result["reward"], result["reached_frame"], result["done_frame"], result["num_steps"] = demo_data["status"], demo_data["reward"], demo_data["reached_frame"], demo_data["done_frame"], demo_data["num_steps"]
-            else:
-                result["status"], result["reward"], result["reached_frame"], result["done_frame"], result["num_steps"] = self.run(scene_id)
+            for cnt in range(self.cfg.demo_failure_time):
+                print(f'start scene_id={scene_id} {cnt+1}-th try')
+                result: NDArray[result_dtype] = np.empty((1, ), dtype=result_dtype)
+                result["scene_id"] = scene_id
+                demo_data_existed = False
+                if self.cfg.demo_dir is not None:
+                    demo_path = os.path.join(self.cfg.demo_dir, scene_id_to_demo_path(scene_id, self.cfg.demo_structure))
+                    if os.path.exists(demo_path):
+                        demo_data_existed = True
+                if demo_data_existed and not self.cfg.overwrite_demo:
+                    demo_data = np.load(demo_path)
+                    result["status"], result["reward"], result["reached_frame"], result["done_frame"], result["num_steps"] = demo_data["status"], demo_data["reward"], demo_data["reached_frame"], demo_data["done_frame"], demo_data["num_steps"]
+                else:
+                    result["status"], result["reward"], result["reached_frame"], result["done_frame"], result["num_steps"] = self.run(scene_id)
+                if result["reward"] > 0:
+                    break
             results.append(result)
+
         if len(results) > 0:
             results: NDArray[result_dtype] = np.stack(results)
         else:

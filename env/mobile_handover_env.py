@@ -57,7 +57,7 @@ class MobileH2RSimConfig:
     verbose: bool = False
 
     set_human_hand_obj_last_frame: bool = True
-
+    handing_over_radius : float = 0.5
 
     table: TableConfig = field(default_factory=TableConfig)
     # hand: HandConfig = field(default_factory=HandConfig) # the format of nested structured configs must be like this https://omegaconf.readthedocs.io/en/2.3_branch/structured_config.html#nesting-structured-configs
@@ -86,7 +86,10 @@ class Observation:
     frame: int
     world_to_ee: NDArray[np.float64]
     joint_positions: NDArray[np.float64]
+    world_to_torso: NDArray[np.float64]
+    world_to_robot_base: NDArray[np.float64]
     get_visual_observation: "MobileH2RSim.get_visual_observation"
+    get_wrist_visual_observation: "MobileH2RSim.get_wrist_visual_observation"
     env: "MobileH2RSim"
 
 class MobileH2RSim:
@@ -130,6 +133,7 @@ class MobileH2RSim:
         self.frame = 0
         self.scene_data = load_scene_data(scene_id, table_height=self.cfg.table_height, stop_moving_frame=self.cfg.stop_moving_frame, frame_interval=self.cfg.frame_interval)
         self.target_object_stopped_because_of_dist = False
+        self.handing_over_object = False
 
         with self.disable_rendering():
             self.ground_id = self.bullet_client.loadURDF("plane_implicit.urdf", basePosition=(0., 0., 0.))
@@ -179,6 +183,11 @@ class MobileH2RSim:
         # code.interact(local=dict(globals(), **locals()))
         return self.robot.get_visual_observation([self.robot.body_id, self.hand.body_id, self.objects.target_object.body_id])
 
+    def get_wrist_visual_observation(self):
+        # code.interact(local=dict(globals(), **locals()))
+        return self.robot.get_wrist_visual_observation([self.robot.body_id, self.hand.body_id, self.objects.target_object.body_id])
+
+
     def get_observation(self) -> Observation:
         # color, depth, segmentation, points = self.robot.get_visual_observation([self.objects.target_object.body_id, self.hand.body_id])
         # "color": color,
@@ -191,8 +200,11 @@ class MobileH2RSim:
         observation = Observation(
             frame=self.frame,
             world_to_ee=self.robot.get_world_to_ee(),
+            world_to_torso=self.robot.get_world_to_torso(),
+            world_to_robot_base=self.robot.get_world_to_robot_base(),
             joint_positions=self.robot.get_joint_positions(),
             get_visual_observation=self.get_visual_observation,
+            get_wrist_visual_observation=self.get_wrist_visual_observation,
             env=self,
         )
         return observation
@@ -304,6 +316,18 @@ class MobileH2RSim:
                 print(action_i, end=" ")
             print("")
         panda_dof_target_position = self.robot.ego_cartesian_action_to_dof_target_position(pos=action[:3], orn=action[3:6], width=action[6:], orn_type="euler")
+        reward, done, info = self.joint_step(panda_dof_target_position, repeat, increase_frame)
+        return reward, done, info
+    
+    def robot_base_ego_cartesian_step(self, action, repeat, increase_frame=True):
+        " action: (3+6+2,) pos+euler+width "
+        if self.cfg.verbose:
+            print(f"in robot_base_ego_cartesian_step, frame={self.frame}", end=" ")
+            for action_i in action:
+                print(action_i, end=" ")
+            print("")
+        panda_dof_target_position = self.robot.robot_base_ego_cartesian_action_to_dof_target_position(chassis_action=action[:3], pos=action[3:6], orn=action[6:9], width=action[9:], orn_type="euler")
+        print('recompute joint position', panda_dof_target_position)
         reward, done, info = self.joint_step(panda_dof_target_position, repeat, increase_frame)
         return reward, done, info
 

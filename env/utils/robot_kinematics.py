@@ -391,6 +391,7 @@ class RobotKinematics:
         if seed is None:
             seed = np.zeros(self.num_joints)
         else:
+            # print(self.num_joints)
             assert seed.shape[0] == self.num_joints
         seed_kdl = list_to_jnt_array(seed)
         # Make IK Call

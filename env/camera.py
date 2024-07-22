@@ -7,7 +7,7 @@ from pybullet_utils.bullet_client import BulletClient
 from scipy.spatial.transform import Rotation as Rt
 import imageio
 import code
-
+import copy
 # def get_view_matrix(pos: Optional[Tuple[float]], orn: Optional[Tuple[float]], target: Optional[Tuple[float]], up_vector: Optional[Tuple[float]]) -> Tuple[float]:
 #     if pos is not None and orn is not None:
 #         assert target is None and up_vector is None
@@ -46,12 +46,23 @@ class CameraConfig:
             urdf_to_opengl = Rt.from_euler("XYZ", (-np.pi/2, 0.0, -np.pi)).as_matrix()
             urdf_to_opengl = Rt.from_euler("XYZ", (np.pi, 0.0, 0.0)).as_matrix()
             # code.interact(local=dict(globals(), **locals()))
-            R = Rt.from_quat(self.orn).as_matrix()@urdf_to_opengl
+            # R = Rt.from_quat(self.orn).as_matrix()@urdf_to_opengl
+            R = Rt.from_quat(self.orn).as_matrix()
             t = -np.array(self.pos).dot(R)
             view_matrix = np.eye(4, dtype=float)
             view_matrix[:3, :3] = R
-            view_matrix[3, :3] = t
+            view_matrix[3, :3] = t              # camera_to_wolrd ^ T
+
+            rot_x_180 = np.array([
+                [1, 0, 0, 0],
+                [0, -1, 0, 0],
+                [0, 0, -1, 0],
+                [0, 0, 0, 1],
+            ])       
+            view_matrix = view_matrix @ rot_x_180
             view_matrix = tuple(view_matrix.flatten())
+
+            # code.interact(local=dict(globals(), **locals()))
             return view_matrix
         elif self.pos is not None and self.target is not None and self.up_vector is not None:
             assert self.orn is None
@@ -64,7 +75,7 @@ class CameraConfig:
 class Camera:
     def __init__(self, bullet_client: BulletClient, cfg: CameraConfig):
         self.bullet_client = bullet_client
-        self.cfg = cfg
+        self.cfg = copy.deepcopy(cfg)
 
         self.projection_matrix = self.bullet_client.computeProjectionMatrixFOV(fov=self.cfg.fov, aspect=self.cfg.width/self.cfg.height, nearVal=self.cfg.near, farVal=self.cfg.far)
 
@@ -98,6 +109,7 @@ class Camera:
     def render(self, segmentation_ids=[]):
         # code.interact(local=dict(globals(), **locals()))
         _, _, color, depth, segmentation = self.bullet_client.getCameraImage(width=self.cfg.width, height=self.cfg.height, viewMatrix=self.cfg.view_matrix, projectionMatrix=self.projection_matrix, renderer=pybullet.ER_BULLET_HARDWARE_OPENGL) # (224, 224, 4), (224, 224), (224, 224)
+        # code.interact(local=dict(globals(), **locals()))
         depth = self.process_depth(depth)
         points = []
         for segmentation_id in segmentation_ids:

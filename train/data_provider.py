@@ -30,7 +30,7 @@ def mat_to_six_d(mat):
 @dataclass
 class DemoDataProcessorConfig:
     obj_pose_pred_frame_num: int = MISSING
-    demo_source: str = "genh2r"
+    demo_source: str = "mobile_genh2r"
     pc: PointCloudProcessorConfig = field(default_factory=PointCloudProcessorConfig)
 
 class DemoDataProcessor:
@@ -46,7 +46,51 @@ class DemoDataProcessor:
     def process(self, demo_data_path: str):
         self.point_cloud_processor.reset()
         processed_demo_data = []
-        if self.cfg.demo_source == "genh2r":
+
+        if self.cfg.demo_source == "mobile_genh2r":
+            demo_data: DemoData = np.load(demo_data_path)
+            num_steps = demo_data["num_steps"]
+            assert demo_data["status"] == EpisodeStatus.SUCCESS
+            actions = demo_data["action"][:, :9]
+            world_to_ees = demo_data["world_to_ee"]
+            world_to_objects = demo_data["world_to_object"]
+            world_to_target_grasps = demo_data["world_to_target_grasp"]
+            world_to_head_cameras, world_to_wrist_cameras = demo_data["world_to_head_camera"], demo_data["world_to_wrist_camera"]
+            world_to_robot_bases = demo_data["world_to_robot_base"]
+
+            for step in range(num_steps):
+                front_camera_object_points, front_camera_hand_points = demo_data[f"object_points_{step}"], demo_data[f"hand_points_{step}"]
+                wrist_camera_object_points, wrist_camera_hand_points = demo_data[f"wrist_object_points_{step}"], demo_data[f"wrist_hand_points_{step}"]
+                
+                #  In mobile robot, we focus on the robot base, not the end effector frame
+                # ee_to_world = se3_inverse(world_to_ees[step])
+                # ee_to_object = ee_to_world@world_to_objects[step]
+                # object_to_ee = se3_inverse(ee_to_object)
+                robot_base_to_world = se3_inverse(world_to_robot_bases[step])
+                robot_base_to_object = robot_base_to_world@world_to_objects[step]
+                object_to_robot_base = se3_inverse(robot_base_to_object)
+                ### to be continue>..
+                input_points = self.point_cloud_processor.process_two_camera(front_camera_object_points, front_camera_hand_points, wrist_camera_object_points,
+                    wrist_camera_hand_points, world_to_head_cameras[step], world_to_wrist_cameras[step], world_to_robot_bases[step])
+                # code.interact(local=dict(globals(), **locals()))
+                if input_points is not None:
+                    object_pred_pose = np.zeros((self.cfg.obj_pose_pred_frame_num, 6))
+
+                    for j in range(step+1, min(step+1+self.cfg.obj_pose_pred_frame_num, num_steps)):
+                        # nxt_ee_to_object = ee_to_world@world_to_objects[j]
+                        # object_pred_pose[j-(step+1)] = mat_to_six_d(nxt_ee_to_object@object_to_ee)
+                        nxt_robot_base_to_object = robot_base_to_world@world_to_objects[j]
+                        object_pred_pose[j-(step+1)] = mat_to_six_d(nxt_robot_base_to_object@object_to_robot_base)
+
+                    if not (True in (np.isnan(world_to_target_grasps[step]))):
+                        # ee_to_target_grasp = se3_inverse(world_to_ees[step])@world_to_target_grasps[step]
+                        # pos, ros_quat = mat_to_pos_ros_quat(ee_to_target_grasp)
+                        robot_base_to_target_grasp = se3_inverse(world_to_robot_bases[step])@world_to_target_grasps[step]
+                        pos, ros_quat = mat_to_pos_ros_quat(robot_base_to_target_grasp)
+                        processed_demo_data.append((input_points, actions[step], np.concatenate([pos, ros_quat]), object_pred_pose.reshape(-1)))
+            # code.interact(local=dict(globals(), **locals()))
+
+        elif self.cfg.demo_source == "genh2r":
             demo_data: DemoData = np.load(demo_data_path)
             num_steps = demo_data["num_steps"]
             assert demo_data["status"] == EpisodeStatus.SUCCESS
@@ -121,7 +165,7 @@ class DemoDataProcessorRemote(DemoDataProcessor):
 class DataProviderConfig:
     demo_dir: str = MISSING
     demo_structure: str = "hierarchical" # "flat"
-    demo_source: str = "genh2r" # "handover-sim"
+    demo_source: str = "mobile_genh2r" # "handover-sim"
     seed: int = MISSING
     batch_size: int = 256
     obj_pose_pred_frame_num: int = MISSING
@@ -156,7 +200,7 @@ class DataProvider:
                 process_calls = self.generate_process_calls()
                 self.get_process_calls(process_calls)
 
-        if self.cfg.demo_source == "genh2r":
+        if self.cfg.demo_source == "genh2r" or "mobile_genh2r":
             print(f"demo data number: {self.demo_data_num}", flush=True)
             results = np.concatenate(self.demo_results_list)
             num_scenes = results.shape[0]
@@ -182,7 +226,7 @@ class DataProvider:
             success_scene_ids = np.load(os.path.join(demo_dir, "success.npy"))
             for scene_id in success_scene_ids:
                 self.demo_paths.append(os.path.join(demo_dir, f"{scene_id}.npz"))
-        elif self.cfg.demo_source == "genh2r" and any(filename.startswith("results") for filename in os.listdir(demo_dir)):
+        elif (self.cfg.demo_source == "genh2r" or self.cfg.demo_source == "mobile_genh2r")  and any(filename.startswith("results") for filename in os.listdir(demo_dir)):
             for filename in os.listdir(demo_dir):
                 if filename.startswith("results"):
                     demo_results: NDArray[result_dtype] = np.load(os.path.join(demo_dir, filename))
@@ -262,6 +306,8 @@ class DataProvider:
             grasp_poses.append(grasp_pose)
             object_pred_poses.append(object_pred_pose)
 
+        # np.savez("tmp/01.npz", point_clouds=point_clouds,grasp_poses=grasp_poses)
+        # code.interact(local=dict(globals(), **locals()))
         point_clouds, expert_actions = torch.tensor(np.stack(point_clouds, axis=0), dtype=torch.float32), torch.tensor(np.stack(expert_actions, axis=0), dtype=torch.float32)
         grasp_poses, object_pred_poses = torch.tensor(np.stack(grasp_poses, axis=0), dtype=torch.float32), torch.tensor(np.stack(object_pred_poses, axis=0), dtype=torch.float32)
         # print(point_clouds.shape, expert_actions.shape, grasp_pose.shape, object_pred_pose.shape)

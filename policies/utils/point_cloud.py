@@ -123,3 +123,64 @@ class PointCloudProcessor:
             input_points = np.concatenate([input_points[:,:3], point_flow_feature, input_points[:,3:]], axis = 1)
 
         return input_points
+
+    def process_two_camera(self, front_camera_object_points, front_camera_hand_points, wrist_camera_object_points, wrist_camera_hand_points,
+                world_to_front_camera, world_to_wrist_camera, world_to_ee) -> Optional[NDArray[np.float32]]:
+        self.world_to_previous_object_points = self.world_to_object_points
+        self.world_to_previous_hand_points = self.world_to_hand_points
+
+        ### concatenate inputs from two camera
+        world_to_new_object_points = np.concatenate((se3_transform_pc(world_to_front_camera, front_camera_object_points),
+         se3_transform_pc(world_to_wrist_camera, wrist_camera_object_points)), axis = 0)
+        world_to_new_hand_points = np.concatenate((se3_transform_pc(world_to_front_camera, front_camera_hand_points),
+         se3_transform_pc(world_to_wrist_camera, wrist_camera_hand_points)), axis = 0)
+
+        # update world to points
+        # if object_points.shape[0] > 0 or hand_points.shape[0] > 0:
+            # world_to_new_object_points = se3_transform_pc(world_to_ee, object_points)
+            # world_to_new_hand_points = se3_transform_pc(world_to_ee, hand_points)
+        if world_to_new_object_points.shape[0] > 0 or world_to_new_hand_points.shape[0] > 0:
+            self.world_to_object_points = world_to_new_object_points
+            self.world_to_hand_points = world_to_new_hand_points
+
+        # convert the stored world_to_points to egocentric
+        ee_to_world = se3_inverse(world_to_ee)
+        object_points = se3_transform_pc(ee_to_world, self.world_to_object_points)
+        hand_points = se3_transform_pc(ee_to_world, self.world_to_hand_points)
+
+        if object_points.shape[0]+hand_points.shape[0] == 0:
+            return None
+
+        if self.cfg.flow_frame_num > 0:
+            object_flow_matrix = self._get_flow_matrix(self.world_to_previous_object_points, self.world_to_object_points)
+            hand_flow_matrix = self._get_flow_matrix(self.world_to_previous_hand_points, self.world_to_hand_points)
+            self.pre_object_flow_matrix_list.append(np.eye(4))
+            self.pre_hand_flow_matrix_list.append(np.eye(4))
+
+            for i in range(-self.cfg.flow_frame_num, 0):
+                self.pre_object_flow_matrix_list[i] = object_flow_matrix @ self.pre_object_flow_matrix_list[i]
+                self.pre_hand_flow_matrix_list[i] = hand_flow_matrix @ self.pre_hand_flow_matrix_list[i]
+
+        input_points = np.zeros((object_points.shape[0]+hand_points.shape[0], 5), dtype=np.float32)
+        input_points[:object_points.shape[0], :3] = object_points
+        input_points[:object_points.shape[0], 3] = 1
+        input_points[object_points.shape[0]:, :3] = hand_points
+        input_points[object_points.shape[0]:, 4] = 1
+        input_points = regularize_pc_point_count(input_points, self.cfg.num_points, self.np_random)
+
+        
+        if self.cfg.flow_frame_num > 0:
+            point_flow_feature = np.zeros((input_points.shape[0], 3 * self.cfg.flow_frame_num))
+            object_mask = input_points[:,3] == True
+            hand_mask = input_points[:,4] == True
+            world_to_new_object_points = se3_transform_pc(world_to_ee, input_points[object_mask, :3])
+            world_to_new_hand_points = se3_transform_pc(world_to_ee, input_points[hand_mask, :3])
+
+            for i in range(self.cfg.flow_frame_num):
+                point_flow_feature[object_mask, i*3 : (i+1)*3] = self._compute_pre_points(self.pre_object_flow_matrix_list[-(i+1)], world_to_new_object_points)
+                point_flow_feature[hand_mask, i*3 : (i+1)*3] = self._compute_pre_points(self.pre_hand_flow_matrix_list[-(i+1)],   world_to_new_hand_points)
+                point_flow_feature[:, i*3 : (i+1)*3] = se3_transform_pc(ee_to_world, point_flow_feature[:, i*3 : (i+1)*3])
+        
+            input_points = np.concatenate([input_points[:,:3], point_flow_feature, input_points[:,3:]], axis = 1)
+
+        return input_points
