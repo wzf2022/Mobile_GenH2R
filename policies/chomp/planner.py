@@ -385,6 +385,7 @@ class CHOMPPlanner:
         min_angle = 180.0
         target_degree = None
         candidate_joint_value = copy.deepcopy(current_joint_values)
+        base_to_target_grasps = base_to_target_grasps[:50]
         for grasp_idx, base_to_grasp in enumerate(base_to_target_grasps):
             for robot_pos_sample_index in range(sample_robot_angle_num):
 

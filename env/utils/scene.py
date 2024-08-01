@@ -71,6 +71,77 @@ def load_scene_data(scene_id: int, table_height: float=0., stop_moving_frame: Op
     scene_data["body_pose"] = scene_mobile_data["body_pose"]  #(T, 7)
     scene_data['body_params'] = scene_mobile_data['body_params']   #(T, 21, 3)
 
+    # These functions allow basic transformation over the loaded scene. 
+    # Please call these function right after the declaration.
+    # Note that if you need them both, take care of the order.
+    def translate(x: float = 0., y: float = 0.):
+        """Allow translation to loaded scene.
+
+        Input:
+        x: (meter) translation on x-axis
+        y: (meter) translation on y-axis
+        """
+        translation = np.array((x, y))
+        scene_data["object_poses"][:, :, :2] += translation
+        scene_data["hand_pose"][:, :2] += translation
+        scene_data["body_pose"][:, :2] += translation
+
+    def rotate(theta: float = 0, center_frame: int = 0):
+        """Allow counterclock wise rotation (coresponding to the first frame of human body) to loaded scene.
+
+        Input:
+        theta: (rat) rotation cross z-axis
+        center_frame: the frame index of the human body picked as the rotation center 
+        """
+        rotation_center = scene_data["body_pose"][center_frame, :2]
+        rotation_matrix = np.eye(4)
+        rotation_matrix[0, 0], rotation_matrix[0, 1], rotation_matrix[1, 0], rotation_matrix[1, 1] = np.cos(theta), -np.sin(theta), np.sin(theta), np.cos(theta) # rotation part
+        rotation_matrix[0, 3] = (1 - np.cos(theta)) * rotation_center[0] + np.sin(theta) * rotation_center[1]
+        rotation_matrix[1, 3] = (1 - np.cos(theta)) * rotation_center[1] - np.sin(theta) * rotation_center[0] # translation compensation due to rotation center offset
+        objects_shape = scene_data["object_poses"].shape
+
+        def matrix_rotate_6d(six_d_array: np.ndarray):
+            """Rotate 6d position through matrix.
+            
+            Input:
+            six_d_array: array of 6d positions (3d translation + 3d intrinsic euler)
+            Output:
+            six_d_array_after_rotation: array of 6d positions after rotation
+            """
+            transform_matrix = np.repeat(np.eye(4)[np.newaxis, :, :], six_d_array.shape[0], axis = 0)
+            transform_matrix[:, :3, :3] = Rt.from_euler("XYZ", six_d_array[:, 3:]).as_matrix()
+            transform_matrix[:, :3, 3] = six_d_array[:, :3]
+            transform_matrix_after_rotation = rotation_matrix @ transform_matrix
+            six_d_array_after_rotation = np.zeros(six_d_array.shape)
+            six_d_array_after_rotation[:, :3] = transform_matrix_after_rotation[:, :3, 3]
+            six_d_array_after_rotation[:, 3:] = Rt.from_matrix(transform_matrix_after_rotation[:, :3, :3]).as_euler("XYZ")
+            return six_d_array_after_rotation
+        
+        def matrix_rotate_7d(seven_d_array: np.ndarray):
+            """Rotate 7d position through matrix.
+            
+            Input:
+            seven_d_array: array of 7d positions (3d translation + 4d quaternion)
+            Output:
+            seven_d_array_after_rotation: array of 7d positions after rotation
+            """
+            transform_matrix = np.repeat(np.eye(4)[np.newaxis, :, :], seven_d_array.shape[0], axis = 0)
+            transform_matrix[:, :3, :3] = Rt.from_quat(seven_d_array[:, 3:]).as_matrix()
+            transform_matrix[:, :3, 3] = seven_d_array[:, :3]
+            transform_matrix_after_rotation = rotation_matrix @ transform_matrix
+            seven_d_array_after_rotation = np.zeros(seven_d_array.shape)
+            seven_d_array_after_rotation[:, :3] = transform_matrix_after_rotation[:, :3, 3]
+            seven_d_array_after_rotation[:, 3:] = Rt.from_matrix(transform_matrix_after_rotation[:, :3, :3]).as_quat()
+            return seven_d_array_after_rotation
+
+        scene_data["object_poses"] = matrix_rotate_6d(scene_data["object_poses"].reshape(-1, 6)).reshape(objects_shape)
+        scene_data["hand_pose"][:, :6] = matrix_rotate_6d(scene_data["hand_pose"][:, :6])
+        scene_data["body_pose"] = matrix_rotate_7d(scene_data["body_pose"])
+
+    # rotate before translate 
+    # rotate(np.pi, -1)
+    # translate(1., 1.)
+
     # the fps is 20            
     scene_data["hand_pose"] = scene_data["hand_pose"].repeat(50, axis = 0)
     scene_data["object_poses"] = scene_data["object_poses"].repeat(50, axis = 1)
@@ -83,6 +154,9 @@ def load_scene_data(scene_id: int, table_height: float=0., stop_moving_frame: Op
         scene_data["endpoints"] = None
     
     scene_data["source"] = "mobile_genh2r"
+
+    
+
     # code.interact(local=dict(globals(), **locals()))
 
     # scene_data = dict(np.load(scene_data_path)) # "hand_name", "hand_side", "hand_path", "hand_pose", "object_names", "object_paths", "object_grasp_id", "object_poses", "endpoints", "source"
